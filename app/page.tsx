@@ -162,8 +162,8 @@ export default function Home() {
           />
           <div className="hero__image-shade" aria-hidden="true" />
           <div className="hero__badge">
-            <span>01</span>
-            <strong>ISKUSTVO<br />KOJE SE VIDI</strong>
+            <span>TITAN</span>
+            <strong>SIGURNO<br />• PRECIZNO</strong>
           </div>
         </div>
       </section>
