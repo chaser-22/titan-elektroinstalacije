@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 const primaryServices = [
   {
     number: "01",
@@ -148,14 +150,17 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="hero__visual" aria-label="Mjesto za glavnu fotografiju">
-          <div className="hero__photo-label">
-            <span>GLAVNA FOTOGRAFIJA</span>
-            <strong>PROJECT<br />PHOTO</strong>
-            <small>PLACEHOLDER • 01</small>
-          </div>
-          <div className="hero__cable hero__cable--one" />
-          <div className="hero__cable hero__cable--two" />
+        <div className="hero__visual">
+          <Image
+            className="hero__image"
+            src="/images/hero-electrician.webp"
+            alt="Električar izvodi precizne radove na razvodnoj tabli"
+            width={1536}
+            height={1024}
+            preload
+            sizes="(max-width: 1180px) 100vw, 50vw"
+          />
+          <div className="hero__image-shade" aria-hidden="true" />
           <div className="hero__badge">
             <span>01</span>
             <strong>ISKUSTVO<br />KOJE SE VIDI</strong>

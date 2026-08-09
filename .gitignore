@@ -26,3 +26,6 @@ yarn-error.log*
 
 # Vercel
 .vercel
+
+# Local generated-image candidates (only selected optimized assets are deployed)
+/public/images/hero-candidates/
