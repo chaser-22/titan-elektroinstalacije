@@ -65,8 +65,17 @@ const process = [
   ["04", "Izvođenje", "Radove završavamo prema dogovorenom planu."],
 ];
 
-function ArrowIcon() {
-  return <span aria-hidden="true">↗</span>;
+function ArrowIcon({ className = "" }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden="true"
+      className={`arrow-icon ${className}`.trim()}
+      focusable="false"
+      viewBox="0 0 24 24"
+    >
+      <path d="M6 18 18 6M9 6h9v9" />
+    </svg>
+  );
 }
 
 export default function Home() {
@@ -177,7 +186,7 @@ export default function Home() {
                 <h3>{service.title}</h3>
                 <p>{service.text}</p>
               </div>
-              <span className="featured-card__arrow" aria-hidden="true">↗</span>
+              <ArrowIcon className="featured-card__arrow" />
             </article>
           ))}
         </div>
