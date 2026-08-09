@@ -161,10 +161,6 @@ export default function Home() {
             sizes="(max-width: 1180px) 100vw, 50vw"
           />
           <div className="hero__image-shade" aria-hidden="true" />
-          <div className="hero__badge">
-            <span>TITAN</span>
-            <strong>SIGURNO<br />• PRECIZNO</strong>
-          </div>
         </div>
       </section>
 
