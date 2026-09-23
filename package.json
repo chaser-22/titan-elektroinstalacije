@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "engines": {
-    "node": ">=20.9.0"
+    "node": "20.x"
   },
   "scripts": {
     "dev": "next dev",
@@ -17,7 +17,7 @@
     "next": "16.3.0",
     "react": "19.2.8",
     "react-dom": "19.2.8",
-    "three": "0.186.0"
+    "three": "0.180.0"
   },
   "devDependencies": {
     "@types/node": "26.2.0",
