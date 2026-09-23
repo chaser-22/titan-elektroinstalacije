@@ -1,81 +1,37 @@
-import Image from "next/image";
+import ThreeScene from "./three-scene";
 
-const primaryServices = [
+const services = [
   {
     number: "01",
-    title: "Naglašena usluga",
-    text: "Kratak opis najvažnije usluge i koristi koju klijent dobija.",
-    tag: "PLACEHOLDER",
+    title: "Jaka struja",
+    text: "Kompletne elektroinstalacije, razvodne table, osigurači, utičnice, prekidači i rasvjeta.",
+    items: ["Novogradnja", "Razvodne table", "Rasvjeta", "Održavanje"],
   },
   {
     number: "02",
-    title: "Naglašena usluga",
-    text: "Kratak opis najvažnije usluge i koristi koju klijent dobija.",
-    tag: "PLACEHOLDER",
+    title: "Slaba struja",
+    text: "Sistemi koji povezuju, nadziru i automatizuju prostor — uredno planirani i precizno izvedeni.",
+    items: ["Video nadzor", "Alarmi", "Interfoni", "LAN / Smart home"],
   },
   {
     number: "03",
-    title: "Naglašena usluga",
-    text: "Kratak opis najvažnije usluge i koristi koju klijent dobija.",
-    tag: "PLACEHOLDER",
-  },
-];
-
-const serviceGroups = [
-  {
-    title: "Jaka struja",
-    items: [
-      "Elektroinstalacije u novogradnji",
-      "Razvodne table i osigurači",
-      "Utičnice, prekidači i rasvjeta",
-      "Održavanje elektroinstalacija",
-    ],
-  },
-  {
-    title: "Slaba struja",
-    items: [
-      "Video nadzor i alarmi",
-      "Interfoni i video interfoni",
-      "Mrežna infrastruktura (LAN)",
-      "Smart home sistemi",
-    ],
-  },
-  {
     title: "Adaptacije",
-    items: [
-      "Renoviranje stambenih prostora",
-      "Montaža i zamjena opreme",
-      "Podno grijanje",
-      "Hitne intervencije",
-    ],
+    text: "Sigurna zamjena i nadogradnja postojećih instalacija tokom renoviranja stambenih i poslovnih prostora.",
+    items: ["Renoviranje", "Montaža opreme", "Podno grijanje", "Intervencije"],
   },
-];
-
-const projects = [
-  { id: "01", label: "FOTOGRAFIJA PROJEKTA", type: "Rasvjeta" },
-  { id: "02", label: "FOTOGRAFIJA PROJEKTA", type: "Razvodna tabla" },
-  { id: "03", label: "FOTOGRAFIJA PROJEKTA", type: "Adaptacija" },
-  { id: "04", label: "FOTOGRAFIJA PROJEKTA", type: "Instalacije" },
-  { id: "05", label: "FOTOGRAFIJA PROJEKTA", type: "Slaba struja" },
-  { id: "06", label: "FOTOGRAFIJA PROJEKTA", type: "Montaža" },
 ];
 
 const process = [
-  ["01", "Kontakt", "Pozivom ili porukom opišite šta vam je potrebno."],
-  ["02", "Procjena", "Dogovaramo obilazak i definišemo obim radova."],
-  ["03", "Ponuda", "Dobijate jasan prijedlog radova i termina."],
-  ["04", "Izvođenje", "Radove završavamo prema dogovorenom planu."],
+  ["01", "Kontakt", "Opišite šta je potrebno i pošaljite osnovne informacije o prostoru ili objektu."],
+  ["02", "Procjena", "Dogovaramo obilazak i precizno definišemo obim radova."],
+  ["03", "Plan", "Dobijate jasan prijedlog izvedbe, materijala i termina."],
+  ["04", "Izvođenje", "Instalaciju završavamo uredno, provjereno i prema dogovoru."],
 ];
 
-function ArrowIcon({ className = "" }: { className?: string }) {
+function Arrow() {
   return (
-    <svg
-      aria-hidden="true"
-      className={`arrow-icon ${className}`.trim()}
-      focusable="false"
-      viewBox="0 0 24 24"
-    >
-      <path d="M6 18 18 6M9 6h9v9" />
+    <svg className="arrow" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M5 19 19 5M9 5h10v10" />
     </svg>
   );
 }
@@ -83,248 +39,194 @@ function ArrowIcon({ className = "" }: { className?: string }) {
 export default function Home() {
   return (
     <>
-      <a className="skip-link" href="#glavni-sadrzaj">
-        Preskoči na glavni sadržaj
-      </a>
+      <a className="skip-link" href="#sadrzaj">Preskoči na sadržaj</a>
+      <ThreeScene />
 
-      <div className="announcement">
-        <div className="announcement__track" aria-hidden="true">
-          <span>ELEKTROINSTALACIJE</span>
-          <span>•</span>
-          <span>CRNA GORA</span>
-          <span>•</span>
-          <span>JAKA I SLABA STRUJA</span>
-          <span>•</span>
-          <span>ELEKTROINSTALACIJE</span>
-          <span>•</span>
-          <span>CRNA GORA</span>
-          <span>•</span>
-          <span>JAKA I SLABA STRUJA</span>
-        </div>
-      </div>
-
-      <header className="site-header">
-        <a className="brand" href="#top" aria-label="Titan početna">
-          <span className="brand__mark">LOGO</span>
-          <span className="brand__text">
-            <strong>TITAN</strong>
-            <small>ELEKTROINSTALACIJE</small>
-          </span>
+      <header className="nav">
+        <a className="logo" href="#top" aria-label="Titan Elektroinstalacije početna">
+          <span className="logo-mark">T</span>
+          <span><strong>TITAN</strong><small>ELEKTROINSTALACIJE</small></span>
         </a>
+
         <nav aria-label="Glavna navigacija">
           <a href="#usluge">Usluge</a>
-          <a href="#projekti">Projekti</a>
-          <a href="#o-nama">O nama</a>
+          <a href="#proces">Proces</a>
+          <a href="#kontakt">Kontakt</a>
         </nav>
-        <a className="button button--small" href="tel:+38267152154">
-          Pozovite nas <ArrowIcon />
+
+        <a className="nav-call" href="tel:+38267152154">
+          <span>067 152 154</span><Arrow />
         </a>
       </header>
 
-      <main id="glavni-sadrzaj" tabIndex={-1}>
-      <section className="hero" id="top">
-        <div className="hero__grid" aria-hidden="true" />
-        <div className="hero__copy">
-          <p className="eyebrow"><span /> TIM ELEKTRIČARA • CRNA GORA</p>
-          <h1>
-            Pouzdano.<br />
-            Precizno.<br />
-            <em>Pod naponom.</em>
-          </h1>
-          <p className="hero__lead">
-            Kompletne električarske usluge za domove, poslovne prostore i
-            objekte — od prve instalacije do posljednjeg prekidača.
-          </p>
-          <div className="hero__actions">
-            <a className="button" href="tel:+38267152154">
-              067 152 154 <ArrowIcon />
-            </a>
-            <a className="text-link" href="#projekti">
-              Pogledajte projekte <span aria-hidden="true">↓</span>
-            </a>
+      <main id="sadrzaj">
+        <section className="hero section-screen" id="top">
+          <div className="hero-copy">
+            <p className="kicker"><span /> ELEKTROINSTALACIJE · CRNA GORA</p>
+            <h1>
+              Energija<br />
+              <span>pod kontrolom.</span>
+            </h1>
+            <p className="hero-lead">
+              Jaka i slaba struja, adaptacije i precizna montaža — jedan tim za
+              instalacije koje moraju raditi sigurno, uredno i bez improvizacije.
+            </p>
+            <div className="hero-actions">
+              <a className="cta" href="tel:+38267152154">Pozovite nas <Arrow /></a>
+              <a className="ghost-link" href="#usluge">Istražite usluge <span>↓</span></a>
+            </div>
           </div>
-          <div className="hero__disciplines" aria-label="Oblasti rada">
-            <span>JAKA STRUJA</span>
-            <span>SLABA STRUJA</span>
-            <span>ADAPTACIJE</span>
+
+          <div className="hero-data" aria-label="Oblasti rada">
+            <div><span>01</span><strong>JAKA STRUJA</strong></div>
+            <div><span>02</span><strong>SLABA STRUJA</strong></div>
+            <div><span>03</span><strong>ADAPTACIJE</strong></div>
           </div>
-        </div>
 
-        <div className="hero__visual">
-          <Image
-            className="hero__image"
-            src="/images/hero-electrician.webp"
-            alt="Električar izvodi precizne radove na razvodnoj tabli"
-            width={1536}
-            height={1024}
-            preload
-            sizes="(max-width: 1180px) 100vw, 50vw"
-          />
-          <div className="hero__image-shade" aria-hidden="true" />
-        </div>
-      </section>
-
-      <section className="services section" id="usluge">
-        <div className="section-heading">
-          <div>
-            <p className="eyebrow"><span /> ŠTA RADIMO</p>
-            <h2>Usluge koje drže<br />sve <em>povezanim.</em></h2>
+          <div className="scroll-cue" aria-hidden="true">
+            <span>SCROLL TO ENERGIZE</span><i />
           </div>
-          <p>
-            Od jednostavne montaže do kompletnih instalacija — jedan tim za
-            sigurno i uredno izveden posao.
-          </p>
-        </div>
+        </section>
 
-        <div className="featured-services">
-          {primaryServices.map((service) => (
-            <article className="featured-card" key={service.number}>
-              <div className="featured-card__top">
-                <span>{service.number}</span>
-                <small>{service.tag}</small>
-              </div>
-              <div>
+        <section className="services section-pad" id="usluge">
+          <div className="section-intro">
+            <p className="kicker"><span /> 01 / USLUGE</p>
+            <h2>Od prve trase<br />do zadnjeg <em>spoja.</em></h2>
+            <p>
+              Projektujemo logiku instalacije, izvodimo radove i završavamo
+              detalje tako da sistem ostane pregledan i servisabilan.
+            </p>
+          </div>
+
+          <div className="service-stack">
+            {services.map((service) => (
+              <article className="service-card" key={service.number}>
+                <div className="service-card__head">
+                  <span>{service.number}</span>
+                  <Arrow />
+                </div>
                 <h3>{service.title}</h3>
                 <p>{service.text}</p>
-              </div>
-              <ArrowIcon className="featured-card__arrow" />
-            </article>
-          ))}
-        </div>
-
-        <div className="service-groups">
-          {serviceGroups.map((group, groupIndex) => (
-            <article className="service-group" key={group.title}>
-              <span className="service-group__number">0{groupIndex + 1}</span>
-              <h3>{group.title}</h3>
-              <ul>
-                {group.items.map((item) => <li key={item}>{item}</li>)}
-              </ul>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="about section" id="o-nama">
-        <div className="about__visual" aria-label="Mjesto za fotografiju tima">
-          <div className="about__placeholder">
-            <span>FOTOGRAFIJA TIMA</span>
-            <strong>TEAM<br />PHOTO</strong>
-            <small>PLACEHOLDER • 02</small>
+                <div className="chips">
+                  {service.items.map((item) => <span key={item}>{item}</span>)}
+                </div>
+              </article>
+            ))}
           </div>
-          <div className="about__stamp">TITAN<br />CG</div>
-        </div>
-        <div className="about__copy">
-          <p className="eyebrow"><span /> O NAMA</p>
-          <h2>Struja je naš zanat.<br /><em>Povjerenje</em> je standard.</h2>
-          <p className="about__intro">
-            PRIVREMENI TEKST — Ovdje dolazi kratka priča o Titan timu,
-            iskustvu i pristupu radu. Dva do tri konkretna pasusa biće dovoljna
-            da klijent odmah zna ko dolazi na teren.
-          </p>
-          <div className="about__facts">
-            <div><span>LOKACIJA</span><strong>Crna Gora</strong></div>
-            <div><span>SERVISNA ZONA</span><strong>Placeholder</strong></div>
-            <div><span>DOSTUPNOST</span><strong>Po dogovoru</strong></div>
+        </section>
+
+        <section className="manifesto section-screen" id="o-nama">
+          <div className="manifesto-index" aria-hidden="true">230V</div>
+          <div className="manifesto-copy">
+            <p className="kicker"><span /> 02 / TITAN STANDARD</p>
+            <h2>
+              Nije dovoljno da radi.<br />
+              <em>Mora biti urađeno kako treba.</em>
+            </h2>
+            <p>
+              Titan Elektroinstalacije radi na stambenim, poslovnim i drugim
+              objektima širom Crne Gore. Fokus je na jasnoj izvedbi, urednoj
+              montaži i dogovoru koji se poštuje od prvog poziva do završetka.
+            </p>
           </div>
-        </div>
-      </section>
-
-      <section className="projects section" id="projekti">
-        <div className="section-heading section-heading--projects">
-          <div>
-            <p className="eyebrow"><span /> IZDVOJENI RADOVI</p>
-            <h2>Rezultati govore<br /><em>najglasnije.</em></h2>
+          <div className="manifesto-facts">
+            <div><span>DISCIPLINA</span><strong>Jaka + slaba struja</strong></div>
+            <div><span>TEREN</span><strong>Crna Gora</strong></div>
+            <div><span>PRISTUP</span><strong>Precizno i uredno</strong></div>
           </div>
-          <a
-            className="text-link"
-            href="https://www.instagram.com/elektroinstalacije_titan/"
-            target="_blank"
-            rel="noreferrer"
-          >
-            Pogledajte Instagram <ArrowIcon />
-          </a>
-        </div>
+        </section>
 
-        <div className="project-grid">
-          {projects.map((project, index) => (
-            <article className={`project-card project-card--${index + 1}`} key={project.id}>
-              <div className="project-card__placeholder">
-                <span>{project.label}</span>
-                <strong>PROJECT<br />PHOTO</strong>
-                <small>PLACEHOLDER • {project.id}</small>
-              </div>
-              <div className="project-card__meta">
-                <span>{project.type}</span>
-                <span>0{index + 1}</span>
-              </div>
+        <section className="process section-pad" id="proces">
+          <div className="section-intro section-intro--sticky">
+            <p className="kicker"><span /> 03 / PROCES</p>
+            <h2>Četiri koraka.<br /><em>Jedan tok.</em></h2>
+            <p>
+              Bez nepotrebnog komplikovanja. Prvo razumijemo prostor i zahtjev,
+              zatim definišemo rješenje i izvodimo ga.
+            </p>
+          </div>
+
+          <div className="timeline">
+            {process.map(([number, title, text]) => (
+              <article key={number}>
+                <span className="timeline-number">{number}</span>
+                <div>
+                  <h3>{title}</h3>
+                  <p>{text}</p>
+                </div>
+                <span className="timeline-dot" aria-hidden="true" />
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="work section-pad">
+          <div className="section-intro">
+            <p className="kicker"><span /> 04 / POD NAPONOM</p>
+            <h2>Sistem se vidi<br />u <em>detaljima.</em></h2>
+          </div>
+
+          <div className="work-grid">
+            <article className="work-panel work-panel--large">
+              <span>RAZVODNE TABLE</span>
+              <strong>Kontrola počinje<br />od dobrog rasporeda.</strong>
+              <i aria-hidden="true">01</i>
             </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="process section">
-        <div className="process__heading">
-          <p className="eyebrow"><span /> KAKO RADIMO</p>
-          <h2>Jednostavno od<br />poziva do <em>završetka.</em></h2>
-        </div>
-        <div className="process__steps">
-          {process.map(([number, title, text]) => (
-            <article key={number}>
-              <span>{number}</span>
-              <h3>{title}</h3>
-              <p>{text}</p>
+            <article className="work-panel">
+              <span>RASVJETA</span>
+              <strong>Funkcija + atmosfera.</strong>
+              <i aria-hidden="true">02</i>
             </article>
-          ))}
-        </div>
-      </section>
+            <article className="work-panel">
+              <span>MREŽA</span>
+              <strong>Čista infrastruktura.</strong>
+              <i aria-hidden="true">03</i>
+            </article>
+            <a
+              className="work-panel work-panel--link"
+              href="https://www.instagram.com/elektroinstalacije_titan/"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <span>VIŠE RADOVA</span>
+              <strong>Instagram</strong>
+              <Arrow />
+            </a>
+          </div>
+        </section>
 
-      <section className="contact" id="kontakt">
-        <div className="contact__bolt" aria-hidden="true">T</div>
-        <div className="contact__content">
-          <p className="eyebrow"><span /> KONTAKT</p>
-          <h2>Imate projekat?<br /><em>Uključimo ga.</em></h2>
-          <p>
-            Opišite nam šta vam je potrebno. Javićemo se radi dogovora i
-            procjene radova.
-          </p>
-          <a className="contact__phone" href="tel:+38267152154">
-            <small>POZOVITE NAS</small>
+        <section className="contact section-screen" id="kontakt">
+          <div className="contact-copy">
+            <p className="kicker"><span /> 05 / KONTAKT</p>
+            <h2>Imate projekat?<br /><em>Uključimo ga.</em></h2>
+            <p>
+              Pozovite i recite šta planirate. Dogovorićemo sljedeći korak i
+              procjenu radova.
+            </p>
+          </div>
+
+          <a className="contact-phone" href="tel:+38267152154">
+            <small>POZOVITE TITAN</small>
             <strong>067 152 154</strong>
-            <ArrowIcon />
+            <Arrow />
           </a>
-        </div>
-        <div className="contact__details">
-          <div>
-            <span>E-MAIL</span>
-            <a href="mailto:email@placeholder.me">email@placeholder.me</a>
-          </div>
-          <div>
-            <span>INSTAGRAM</span>
+
+          <div className="contact-meta">
+            <span>CRNA GORA</span>
             <a
               href="https://www.instagram.com/elektroinstalacije_titan/"
               target="_blank"
               rel="noreferrer"
             >
-              @elektroinstalacije_titan
+              @elektroinstalacije_titan ↗
             </a>
           </div>
-          <div>
-            <span>SERVISNA ZONA</span>
-            <strong>PLACEHOLDER, CRNA GORA</strong>
-          </div>
-        </div>
-      </section>
-
+        </section>
       </main>
 
       <footer>
-        <a className="brand brand--footer" href="#top" aria-label="Titan početna">
-          <span className="brand__mark">LOGO</span>
-          <span className="brand__text"><strong>TITAN</strong><small>ELEKTROINSTALACIJE</small></span>
-        </a>
-        <p>© {new Date().getFullYear()} Titan Elektroinstalacije</p>
-        <a href="#top">Nazad na vrh ↑</a>
+        <span>© {new Date().getFullYear()} TITAN ELEKTROINSTALACIJE</span>
+        <a href="#top">NAZAD NA VRH ↑</a>
       </footer>
     </>
   );
