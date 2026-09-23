@@ -315,13 +315,16 @@ export default function ElectricalScene() {
       reducedMotion.removeEventListener("change", handleMotionPreference);
       document.documentElement.style.removeProperty("--scroll-progress");
 
-      scene.traverse((object) => {
-        if (object instanceof THREE.Mesh || object instanceof THREE.Points) {
-          object.geometry.dispose();
-          const material = object.material;
-          if (Array.isArray(material)) material.forEach((item) => item.dispose());
-          else material.dispose();
-        }
+      scene.traverse((object: unknown) => {
+        if (!object || typeof object !== "object") return;
+        const candidate = object as {
+          geometry?: { dispose: () => void };
+          material?: { dispose: () => void } | Array<{ dispose: () => void }>;
+        };
+        candidate.geometry?.dispose();
+        const material = candidate.material;
+        if (Array.isArray(material)) material.forEach((item) => item.dispose());
+        else material?.dispose();
       });
       renderer.dispose();
       renderer.domElement.remove();
