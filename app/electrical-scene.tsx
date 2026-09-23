@@ -4,9 +4,14 @@ import { useEffect, useRef } from "react";
 import * as THREE from "three";
 
 const YELLOW = 0xf4b700;
-const WARM_YELLOW = 0xffd54d;
-const STEEL = 0x263044;
-const DARK_STEEL = 0x111827;
+const YELLOW_SOFT = 0xffd54d;
+const BLUE = 0x2b67ff;
+const RED = 0xd64135;
+const STEEL = 0x6f7d95;
+const DARK = 0x080d1a;
+const DARK_STEEL = 0x141b29;
+
+const CABLE_COLORS = [0x171d28, YELLOW, BLUE, RED, 0x7b8799, 0x252d3d];
 
 export default function ElectricalScene() {
   const mountRef = useRef<HTMLDivElement>(null);
@@ -17,10 +22,10 @@ export default function ElectricalScene() {
 
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x080d1a, 0.085);
+    scene.fog = new THREE.FogExp2(DARK, 0.072);
 
-    const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 60);
-    camera.position.set(0, 0, 7.6);
+    const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 80);
+    camera.position.set(0, 0, 8.4);
 
     const renderer = new THREE.WebGLRenderer({
       alpha: true,
@@ -28,204 +33,462 @@ export default function ElectricalScene() {
       powerPreference: "high-performance",
     });
     renderer.setClearColor(0x000000, 0);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.7));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.65));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.08;
+    renderer.toneMappingExposure = 1.16;
     mount.appendChild(renderer.domElement);
 
     const root = new THREE.Group();
+    const network = new THREE.Group();
+    root.add(network);
     scene.add(root);
 
-    scene.add(new THREE.HemisphereLight(0xaab7d3, 0x080d1a, 1.2));
+    scene.add(new THREE.HemisphereLight(0xaebdd8, 0x050811, 1.15));
 
-    const keyLight = new THREE.DirectionalLight(0xffffff, 2.8);
-    keyLight.position.set(4, 5, 7);
+    const keyLight = new THREE.DirectionalLight(0xffffff, 3.1);
+    keyLight.position.set(4.5, 5.5, 7);
     scene.add(keyLight);
 
-    const rimLight = new THREE.PointLight(YELLOW, 14, 11, 2);
-    rimLight.position.set(2.5, 2.4, 2.2);
-    scene.add(rimLight);
+    const warmLight = new THREE.PointLight(YELLOW, 18, 10, 2);
+    warmLight.position.set(2.8, 2.7, 2.8);
+    scene.add(warmLight);
 
-    const curve = new THREE.CatmullRomCurve3([
-      new THREE.Vector3(1.8, 4.4, -0.4),
-      new THREE.Vector3(1.25, 3.2, 0.2),
-      new THREE.Vector3(2.05, 2.25, -0.35),
-      new THREE.Vector3(1.15, 1.3, 0.25),
-      new THREE.Vector3(1.7, 0.2, -0.3),
-      new THREE.Vector3(0.85, -0.9, 0.3),
-      new THREE.Vector3(1.55, -2.0, -0.2),
-      new THREE.Vector3(0.8, -3.2, 0.25),
-      new THREE.Vector3(1.3, -4.4, -0.35),
+    const blueLight = new THREE.PointLight(BLUE, 7, 8, 2);
+    blueLight.position.set(-2.8, -1.8, 1.3);
+    scene.add(blueLight);
+
+    const backbone = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(1.65, 5.0, -0.55),
+      new THREE.Vector3(1.05, 4.1, 0.08),
+      new THREE.Vector3(1.8, 3.0, 0.35),
+      new THREE.Vector3(0.75, 2.0, -0.25),
+      new THREE.Vector3(1.45, 0.95, -0.52),
+      new THREE.Vector3(0.45, -0.15, 0.18),
+      new THREE.Vector3(1.18, -1.25, 0.42),
+      new THREE.Vector3(0.2, -2.35, -0.15),
+      new THREE.Vector3(0.9, -3.45, -0.48),
+      new THREE.Vector3(0.35, -5.0, 0.08),
     ]);
-    curve.curveType = "catmullrom";
-    curve.tension = 0.38;
+    backbone.curveType = "catmullrom";
+    backbone.tension = 0.42;
 
-    const outerCable = new THREE.Mesh(
-      new THREE.TubeGeometry(curve, 220, 0.11, 12, false),
+    const sampleCount = 180;
+    const frames = backbone.computeFrenetFrames(sampleCount, false);
+    const cableCurves: any[] = [];
+    const cableMeshes: any[] = [];
+
+    const cableMaterial = (color: number, index: number) =>
       new THREE.MeshStandardMaterial({
-        color: DARK_STEEL,
-        metalness: 0.92,
-        roughness: 0.24,
+        color,
+        metalness: index === 0 ? 0.5 : 0.16,
+        roughness: index === 0 ? 0.48 : 0.36,
+        emissive: color === YELLOW ? 0x332500 : 0x000000,
+        emissiveIntensity: color === YELLOW ? 0.42 : 0,
+      });
+
+    CABLE_COLORS.forEach((color, cableIndex) => {
+      const points = [];
+      const phase = (cableIndex / CABLE_COLORS.length) * Math.PI * 2;
+
+      for (let index = 0; index <= sampleCount; index += 1) {
+        const t = index / sampleCount;
+        const point = backbone.getPointAt(t);
+        const frameIndex = Math.min(index, sampleCount - 1);
+        const normal = frames.normals[frameIndex];
+        const binormal = frames.binormals[frameIndex];
+        const twist = phase + t * Math.PI * 12;
+        const bundleRadius = cableIndex === 0 ? 0.12 : 0.205;
+
+        const offset = normal
+          .clone()
+          .multiplyScalar(Math.cos(twist) * bundleRadius)
+          .add(binormal.clone().multiplyScalar(Math.sin(twist) * bundleRadius));
+
+        points.push(point.clone().add(offset));
+      }
+
+      const curve = new THREE.CatmullRomCurve3(points);
+      curve.curveType = "catmullrom";
+      curve.tension = 0.44;
+      cableCurves.push(curve);
+
+      const mesh = new THREE.Mesh(
+        new THREE.TubeGeometry(curve, 360, cableIndex === 0 ? 0.07 : 0.065, 10, false),
+        cableMaterial(color, cableIndex),
+      );
+      network.add(mesh);
+      cableMeshes.push(mesh);
+    });
+
+    const sheath = new THREE.Mesh(
+      new THREE.TubeGeometry(backbone, 300, 0.34, 16, false),
+      new THREE.MeshPhysicalMaterial({
+        color: 0x8793a8,
+        metalness: 0.04,
+        roughness: 0.18,
+        transmission: 0.15,
+        transparent: true,
+        opacity: 0.085,
+        depthWrite: false,
+        side: THREE.DoubleSide,
       }),
     );
-    root.add(outerCable);
+    network.add(sheath);
 
-    const conductor = new THREE.Mesh(
-      new THREE.TubeGeometry(curve, 220, 0.032, 8, false),
-      new THREE.MeshBasicMaterial({ color: YELLOW }),
+    const sheathWire = new THREE.Mesh(
+      new THREE.TubeGeometry(backbone, 260, 0.355, 8, false),
+      new THREE.MeshBasicMaterial({
+        color: 0x5f6a7e,
+        transparent: true,
+        opacity: 0.09,
+        wireframe: true,
+        depthWrite: false,
+      }),
     );
-    root.add(conductor);
+    network.add(sheathWire);
 
-    const junctionMaterial = new THREE.MeshStandardMaterial({
-      color: STEEL,
-      metalness: 0.9,
-      roughness: 0.28,
-    });
-    const ringMaterial = new THREE.MeshStandardMaterial({
-      color: 0x65708a,
-      metalness: 1,
+    const clampMaterial = new THREE.MeshStandardMaterial({
+      color: 0x323c50,
+      metalness: 0.95,
       roughness: 0.2,
-      emissive: 0x141923,
-      emissiveIntensity: 0.6,
+    });
+    const clampEdgeMaterial = new THREE.MeshStandardMaterial({
+      color: STEEL,
+      metalness: 1,
+      roughness: 0.16,
+      emissive: 0x111522,
+      emissiveIntensity: 0.5,
     });
 
-    const junctions: Array<{ rotation: { x: number } }> = [];
-    [0.13, 0.34, 0.57, 0.79].forEach((t, index) => {
-      const point = curve.getPointAt(t);
+    const clamps: any[] = [];
+    const junctionTs = [0.14, 0.33, 0.54, 0.75, 0.91];
+
+    junctionTs.forEach((t, index) => {
+      const point = backbone.getPointAt(t);
+      const tangent = backbone.getTangentAt(t).normalize();
       const group = new THREE.Group();
       group.position.copy(point);
+      group.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), tangent);
 
       const body = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.22, 0.22, 0.34, 18),
-        junctionMaterial,
+        new THREE.CylinderGeometry(0.43, 0.43, 0.16, 28, 1, false),
+        clampMaterial,
       );
-      body.rotation.z = Math.PI / 2;
       group.add(body);
 
-      const collar = new THREE.Mesh(
-        new THREE.TorusGeometry(0.27, 0.035, 8, 32),
-        ringMaterial,
+      const edgeA = new THREE.Mesh(
+        new THREE.TorusGeometry(0.43, 0.025, 8, 38),
+        clampEdgeMaterial,
       );
-      collar.rotation.y = Math.PI / 2;
-      group.add(collar);
+      edgeA.rotation.x = Math.PI / 2;
+      edgeA.position.y = 0.081;
+      group.add(edgeA);
 
-      const dot = new THREE.Mesh(
-        new THREE.SphereGeometry(0.05, 14, 14),
-        new THREE.MeshBasicMaterial({ color: index % 2 ? WARM_YELLOW : YELLOW }),
+      const edgeB = edgeA.clone();
+      edgeB.position.y = -0.081;
+      group.add(edgeB);
+
+      const indicator = new THREE.Mesh(
+        new THREE.BoxGeometry(0.09, 0.19, 0.035),
+        new THREE.MeshBasicMaterial({ color: index % 2 ? YELLOW_SOFT : YELLOW }),
       );
-      dot.position.set(0, 0, 0.2);
-      group.add(dot);
+      indicator.position.set(0.43, 0, 0);
+      group.add(indicator);
 
-      root.add(group);
-      junctions.push(group);
+      network.add(group);
+      clamps.push(group);
     });
 
-    const pulse = new THREE.Group();
-    const pulseCore = new THREE.Mesh(
-      new THREE.IcosahedronGeometry(0.18, 2),
-      new THREE.MeshBasicMaterial({ color: WARM_YELLOW }),
-    );
-    pulse.add(pulseCore);
+    const terminalGroup = new THREE.Group();
+    terminalGroup.position.copy(backbone.getPointAt(0.055));
 
-    const pulseShell = new THREE.Mesh(
-      new THREE.IcosahedronGeometry(0.31, 1),
-      new THREE.MeshBasicMaterial({
-        color: YELLOW,
-        transparent: true,
-        opacity: 0.18,
-        wireframe: true,
-      }),
-    );
-    pulse.add(pulseShell);
-
-    const pulseRingA = new THREE.Mesh(
-      new THREE.TorusGeometry(0.42, 0.018, 8, 48),
-      new THREE.MeshBasicMaterial({ color: YELLOW, transparent: true, opacity: 0.78 }),
-    );
-    pulseRingA.rotation.x = Math.PI / 2;
-    pulse.add(pulseRingA);
-
-    const pulseRingB = pulseRingA.clone();
-    pulseRingB.scale.setScalar(1.28);
-    pulseRingB.rotation.y = Math.PI / 2;
-    pulse.add(pulseRingB);
-
-    const pulseLight = new THREE.PointLight(YELLOW, 18, 5.8, 1.8);
-    pulse.add(pulseLight);
-    root.add(pulse);
-
-    const heroCore = new THREE.Group();
-    heroCore.position.set(1.55, 1.05, -0.55);
-
-    const coreBody = new THREE.Mesh(
-      new THREE.DodecahedronGeometry(0.72, 1),
+    const terminalCore = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.6, 0.6, 0.46, 30),
       new THREE.MeshStandardMaterial({
-        color: 0x1c2537,
-        metalness: 0.98,
+        color: DARK_STEEL,
+        metalness: 0.95,
         roughness: 0.2,
-        emissive: 0x221b00,
-        emissiveIntensity: 0.75,
       }),
     );
-    heroCore.add(coreBody);
+    terminalCore.rotation.z = Math.PI / 2;
+    terminalGroup.add(terminalCore);
 
-    const coreWire = new THREE.Mesh(
-      new THREE.DodecahedronGeometry(0.92, 1),
-      new THREE.MeshBasicMaterial({
-        color: YELLOW,
-        wireframe: true,
-        transparent: true,
-        opacity: 0.36,
-      }),
-    );
-    heroCore.add(coreWire);
-
-    [1.15, 1.48, 1.82].forEach((radius, index) => {
+    [0.72, 0.9, 1.1].forEach((radius, index) => {
       const ring = new THREE.Mesh(
-        new THREE.TorusGeometry(radius, index === 1 ? 0.028 : 0.018, 8, 80),
+        new THREE.TorusGeometry(radius, index === 1 ? 0.03 : 0.018, 8, 72),
         new THREE.MeshBasicMaterial({
-          color: index === 1 ? WARM_YELLOW : 0x7b8498,
+          color: index === 1 ? YELLOW : STEEL,
           transparent: true,
-          opacity: index === 1 ? 0.78 : 0.42,
+          opacity: index === 1 ? 0.85 : 0.35,
         }),
       );
-      ring.rotation.set(index * 0.7, index * 0.45, index * 0.85);
-      heroCore.add(ring);
+      ring.rotation.set(index * 0.45, Math.PI / 2 + index * 0.2, index * 0.7);
+      terminalGroup.add(ring);
     });
-    root.add(heroCore);
+    network.add(terminalGroup);
 
-    const particleCount = 240;
-    const positions = new Float32Array(particleCount * 3);
-    let seed = 17;
+    const createGlowTexture = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = 128;
+      canvas.height = 128;
+      const context = canvas.getContext("2d");
+      if (!context) return null;
+
+      const gradient = context.createRadialGradient(64, 64, 2, 64, 64, 62);
+      gradient.addColorStop(0, "rgba(255,225,95,1)");
+      gradient.addColorStop(0.2, "rgba(244,183,0,.85)");
+      gradient.addColorStop(0.55, "rgba(244,183,0,.22)");
+      gradient.addColorStop(1, "rgba(244,183,0,0)");
+      context.fillStyle = gradient;
+      context.fillRect(0, 0, 128, 128);
+
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.colorSpace = THREE.SRGBColorSpace;
+      return texture;
+    };
+
+    const glowTexture = createGlowTexture();
+
+    const pulseObjects: Array<{
+      group: any;
+      curve: any;
+      offset: number;
+      speed: number;
+    }> = [];
+
+    const makePulse = (curve: any, offset: number, speed: number, scale = 1) => {
+      const pulse = new THREE.Group();
+
+      const core = new THREE.Mesh(
+        new THREE.SphereGeometry(0.065 * scale, 14, 14),
+        new THREE.MeshBasicMaterial({ color: YELLOW_SOFT }),
+      );
+      pulse.add(core);
+
+      if (glowTexture) {
+        const sprite = new THREE.Sprite(
+          new THREE.SpriteMaterial({
+            map: glowTexture,
+            color: YELLOW,
+            transparent: true,
+            opacity: 0.78,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false,
+          }),
+        );
+        sprite.scale.setScalar(0.72 * scale);
+        pulse.add(sprite);
+      }
+
+      network.add(pulse);
+      pulseObjects.push({ group: pulse, curve, offset, speed });
+      return pulse;
+    };
+
+    cableCurves.forEach((curve, cableIndex) => {
+      makePulse(curve, cableIndex * 0.13, 0.025 + cableIndex * 0.002, cableIndex === 1 ? 1.15 : 0.72);
+      makePulse(curve, 0.45 + cableIndex * 0.09, 0.021 + cableIndex * 0.0014, 0.62);
+    });
+
+    const branchGroups: Array<{
+      group: any;
+      start: number;
+      curves: any[];
+      endpoint: any;
+      connectorMaterial: any;
+    }> = [];
+
+    const branchDefinitions = [
+      { t: 0.31, end: new THREE.Vector3(-2.45, 0.9, 0.65), start: 0.14 },
+      { t: 0.52, end: new THREE.Vector3(2.65, -0.45, -0.15), start: 0.36 },
+      { t: 0.72, end: new THREE.Vector3(-2.25, -1.1, 0.55), start: 0.58 },
+    ];
+
+    branchDefinitions.forEach((definition, branchIndex) => {
+      const anchor = backbone.getPointAt(definition.t);
+      const tangent = backbone.getTangentAt(definition.t).normalize();
+      const group = new THREE.Group();
+      group.position.copy(anchor);
+
+      const localEnd = definition.end.clone();
+      const branchCurves: any[] = [];
+
+      [0, 1, 2].forEach((strandIndex) => {
+        const lateral = (strandIndex - 1) * 0.12;
+        const curve = new THREE.CatmullRomCurve3([
+          new THREE.Vector3(0, lateral, 0),
+          tangent.clone().multiplyScalar(0.55).add(new THREE.Vector3(0, lateral * 2, 0.22)),
+          localEnd.clone().multiplyScalar(0.52).add(new THREE.Vector3(0, lateral, 0.3)),
+          localEnd.clone().add(new THREE.Vector3(0, lateral, 0)),
+        ]);
+        curve.curveType = "catmullrom";
+        curve.tension = 0.38;
+        branchCurves.push(curve);
+
+        const color = strandIndex === 1 ? YELLOW : strandIndex === 0 ? 0x202a3a : BLUE;
+        const mesh = new THREE.Mesh(
+          new THREE.TubeGeometry(curve, 150, 0.05, 9, false),
+          cableMaterial(color, strandIndex === 1 ? 1 : 4),
+        );
+        group.add(mesh);
+      });
+
+      const connectorMaterial = new THREE.MeshStandardMaterial({
+        color: 0x222b3c,
+        metalness: 0.94,
+        roughness: 0.22,
+        emissive: YELLOW,
+        emissiveIntensity: 0.04,
+      });
+
+      const connector = new THREE.Mesh(
+        new THREE.BoxGeometry(0.48, 0.48, 0.48),
+        connectorMaterial,
+      );
+      connector.rotation.set(0.25, branchIndex * 0.55, 0.3);
+      group.add(connector);
+
+      const connectorRing = new THREE.Mesh(
+        new THREE.TorusGeometry(0.39, 0.025, 8, 36),
+        new THREE.MeshBasicMaterial({ color: YELLOW, transparent: true, opacity: 0.55 }),
+      );
+      connectorRing.rotation.set(Math.PI / 2, branchIndex * 0.4, 0);
+      group.add(connectorRing);
+
+      const endpoint = new THREE.Group();
+      endpoint.position.copy(localEnd);
+
+      const socket = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.28, 0.34, 0.55, 20),
+        clampMaterial,
+      );
+      socket.rotation.z = Math.PI / 2;
+      endpoint.add(socket);
+
+      const socketGlow = new THREE.Mesh(
+        new THREE.TorusGeometry(0.31, 0.025, 7, 30),
+        new THREE.MeshBasicMaterial({ color: branchIndex === 1 ? YELLOW_SOFT : YELLOW }),
+      );
+      socketGlow.rotation.y = Math.PI / 2;
+      endpoint.add(socketGlow);
+
+      group.add(endpoint);
+      network.add(group);
+
+      branchCurves.forEach((curve, curveIndex) => {
+        const pulse = makePulse(curve, branchIndex * 0.17 + curveIndex * 0.21, 0.035 + curveIndex * 0.003, 0.55);
+        group.add(pulse);
+        network.remove(pulse);
+      });
+
+      branchGroups.push({
+        group,
+        start: definition.start,
+        curves: branchCurves,
+        endpoint,
+        connectorMaterial,
+      });
+    });
+
+    const arcGroup = new THREE.Group();
+    network.add(arcGroup);
+    const arcLines: any[] = [];
+
+    for (let arcIndex = 0; arcIndex < 4; arcIndex += 1) {
+      const geometry = new THREE.BufferGeometry();
+      geometry.setAttribute("position", new THREE.BufferAttribute(new Float32Array(24 * 3), 3));
+      const material = new THREE.LineBasicMaterial({
+        color: arcIndex % 2 ? YELLOW_SOFT : YELLOW,
+        transparent: true,
+        opacity: 0,
+        blending: THREE.AdditiveBlending,
+      });
+      const line = new THREE.Line(geometry, material);
+      arcGroup.add(line);
+      arcLines.push(line);
+    }
+
+    const regenerateArcs = (time: number, activeIndex: number) => {
+      const seedBase = Math.floor(time / 110) + activeIndex * 47;
+      arcLines.forEach((line, lineIndex) => {
+        const positions = line.geometry.attributes.position.array as Float32Array;
+        const angle = lineIndex * 1.55 + activeIndex * 0.6;
+        const end = new THREE.Vector3(
+          Math.cos(angle) * (0.6 + lineIndex * 0.08),
+          (lineIndex - 1.5) * 0.22,
+          Math.sin(angle) * (0.6 + lineIndex * 0.08),
+        );
+
+        for (let pointIndex = 0; pointIndex < 24; pointIndex += 1) {
+          const t = pointIndex / 23;
+          const pseudo = Math.sin((seedBase + pointIndex * 13 + lineIndex * 31) * 12.9898) * 43758.5453;
+          const noise = (pseudo - Math.floor(pseudo) - 0.5) * 0.16 * Math.sin(Math.PI * t);
+
+          positions[pointIndex * 3] = end.x * t + noise;
+          positions[pointIndex * 3 + 1] = end.y * t + noise * 0.65;
+          positions[pointIndex * 3 + 2] = end.z * t - noise * 0.8;
+        }
+
+        line.geometry.attributes.position.needsUpdate = true;
+      });
+    };
+
+    const particleCount = 420;
+    const particlePositions = new Float32Array(particleCount * 3);
+    let seed = 29;
     const random = () => {
       seed = (seed * 16807) % 2147483647;
       return (seed - 1) / 2147483646;
     };
-    for (let i = 0; i < particleCount; i += 1) {
-      positions[i * 3] = (random() - 0.35) * 10;
-      positions[i * 3 + 1] = (random() - 0.5) * 11;
-      positions[i * 3 + 2] = (random() - 0.5) * 7 - 1.3;
+
+    for (let index = 0; index < particleCount; index += 1) {
+      particlePositions[index * 3] = (random() - 0.38) * 12;
+      particlePositions[index * 3 + 1] = (random() - 0.5) * 12;
+      particlePositions[index * 3 + 2] = (random() - 0.5) * 7 - 1.6;
     }
+
     const particleGeometry = new THREE.BufferGeometry();
-    particleGeometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+    particleGeometry.setAttribute("position", new THREE.BufferAttribute(particlePositions, 3));
     const particles = new THREE.Points(
       particleGeometry,
       new THREE.PointsMaterial({
         color: 0x66728a,
-        size: 0.025,
+        size: 0.022,
         transparent: true,
-        opacity: 0.5,
+        opacity: 0.42,
         sizeAttenuation: true,
       }),
     );
     root.add(particles);
+
+    const depthRings = new THREE.Group();
+    [-3.4, -1.6, 0.4, 2.4].forEach((z, index) => {
+      const ring = new THREE.Mesh(
+        new THREE.TorusGeometry(2.6 + index * 0.45, 0.012, 6, 96),
+        new THREE.MeshBasicMaterial({
+          color: index === 2 ? YELLOW : 0x536078,
+          transparent: true,
+          opacity: index === 2 ? 0.16 : 0.08,
+        }),
+      );
+      ring.position.set(1, (index - 1.5) * 1.6, z);
+      ring.rotation.set(0.7 + index * 0.15, 0.45, index * 0.42);
+      depthRings.add(ring);
+    });
+    root.add(depthRings);
 
     let progress = 0;
     let targetProgress = 0;
     let pointerX = 0;
     let pointerY = 0;
     let frame = 0;
+    let lastArcTick = -1;
+
+    const smoothStep = (edge0: number, edge1: number, value: number) => {
+      const x = THREE.MathUtils.clamp((value - edge0) / Math.max(edge1 - edge0, 0.0001), 0, 1);
+      return x * x * (3 - 2 * x);
+    };
 
     const updateScroll = () => {
       const maxScroll = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1);
@@ -244,44 +507,90 @@ export default function ElectricalScene() {
       camera.aspect = width / Math.max(height, 1);
       camera.updateProjectionMatrix();
       renderer.setSize(width, height, false);
-      root.position.x = width < 760 ? -0.55 : 0;
-      root.scale.setScalar(width < 760 ? 0.84 : width < 1180 ? 0.92 : 1);
+
+      const mobile = width < 760;
+      root.position.x = mobile ? -0.7 : 0;
+      root.position.y = mobile ? -0.15 : 0;
+      root.scale.setScalar(mobile ? 0.79 : width < 1180 ? 0.92 : 1);
     };
 
     const renderScene = (time = 0) => {
       const still = reducedMotion.matches;
-      progress = still ? targetProgress : THREE.MathUtils.lerp(progress, targetProgress, 0.065);
+      progress = still ? targetProgress : THREE.MathUtils.lerp(progress, targetProgress, 0.055);
 
-      const pulseT = THREE.MathUtils.clamp(progress, 0.015, 0.985);
-      pulse.position.copy(curve.getPointAt(pulseT));
-      const tangent = curve.getTangentAt(pulseT).normalize();
-      pulse.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), tangent);
+      const activeBranch = Math.min(2, Math.max(0, Math.floor(progress * 3.2)));
+      const activeT = branchDefinitions[activeBranch].t;
+      const activePoint = backbone.getPointAt(activeT);
 
-      const heroFade = 1 - THREE.MathUtils.smoothstep(progress, 0.12, 0.38);
-      heroCore.visible = heroFade > 0.01;
-      heroCore.scale.setScalar(0.8 + heroFade * 0.2);
-      heroCore.rotation.y = still ? 0.4 : time * 0.00018;
-      heroCore.rotation.x = still ? -0.2 : Math.sin(time * 0.00022) * 0.16;
+      branchGroups.forEach((branch, index) => {
+        const reveal = smoothStep(branch.start, branch.start + 0.13, progress);
+        const scale = Math.max(0.015, reveal);
+        branch.group.scale.setScalar(scale);
+        branch.group.visible = reveal > 0.01;
+        branch.endpoint.rotation.x = still ? 0.2 : Math.sin(time * 0.0012 + index) * 0.18;
+        branch.endpoint.rotation.y = still ? 0.25 : time * 0.00035 * (index % 2 ? -1 : 1);
+        branch.connectorMaterial.emissiveIntensity =
+          0.05 + (index === activeBranch ? 0.78 * (0.6 + 0.4 * Math.sin(time * 0.006)) : 0.04);
+      });
 
-      if (!still) {
-        pulseCore.rotation.x = time * 0.0011;
-        pulseCore.rotation.y = time * 0.0014;
-        pulseShell.rotation.y = -time * 0.0008;
-        pulseRingA.rotation.z = time * 0.0009;
-        pulseRingB.rotation.x = Math.PI / 2 + time * 0.00065;
-        particles.rotation.y = time * 0.000025;
-        junctions.forEach((junction, index) => {
-          junction.rotation.x = Math.sin(time * 0.00045 + index) * 0.08;
-        });
+      pulseObjects.forEach((pulse, index) => {
+        const t = (pulse.offset + time * 0.001 * pulse.speed + progress * 0.32) % 1;
+        pulse.group.position.copy(pulse.curve.getPointAt(t));
+        const tangent = pulse.curve.getTangentAt(t).normalize();
+        pulse.group.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), tangent);
+        const pulseScale = 0.86 + Math.sin(time * 0.009 + index) * 0.14;
+        pulse.group.scale.setScalar(pulseScale);
+      });
+
+      clamps.forEach((clamp, index) => {
+        clamp.rotation.y = still ? 0 : Math.sin(time * 0.0007 + index * 1.4) * 0.08;
+      });
+
+      cableMeshes.forEach((mesh, index) => {
+        const separation = smoothStep(0.22, 0.56, progress) * (1 - smoothStep(0.78, 0.98, progress));
+        const angle = (index / cableMeshes.length) * Math.PI * 2;
+        mesh.position.x = Math.cos(angle) * separation * 0.12;
+        mesh.position.z = Math.sin(angle) * separation * 0.12;
+      });
+
+      terminalGroup.rotation.y = still ? 0.3 : time * 0.00025;
+      terminalGroup.rotation.x = still ? 0.1 : Math.sin(time * 0.00045) * 0.12;
+
+      arcGroup.position.copy(activePoint);
+      const arcTick = Math.floor(time / 110);
+      if (arcTick !== lastArcTick) {
+        regenerateArcs(time, activeBranch);
+        lastArcTick = arcTick;
       }
 
-      const xDrift = window.innerWidth < 760 ? 0 : pointerX * 0.18;
-      const yDrift = window.innerWidth < 760 ? 0 : -pointerY * 0.08;
+      arcLines.forEach((line, index) => {
+        const material = line.material;
+        material.opacity = still ? 0.12 : Math.max(0, Math.sin(time * 0.012 + index * 1.8)) * 0.72;
+      });
+
+      if (!still) {
+        particles.rotation.y = time * 0.000018;
+        depthRings.rotation.z = time * 0.000025;
+      }
+
+      const sceneTurn = progress * 0.72;
+      network.rotation.y = sceneTurn + (window.innerWidth < 760 ? 0 : pointerX * 0.08);
+      network.rotation.z = -0.05 + Math.sin(progress * Math.PI * 2) * 0.055;
+      network.position.y = Math.sin(progress * Math.PI) * 0.16;
+
+      const xDrift = window.innerWidth < 760 ? 0 : pointerX * 0.2;
+      const yDrift = window.innerWidth < 760 ? 0 : -pointerY * 0.11;
       camera.position.x = THREE.MathUtils.lerp(camera.position.x, xDrift, 0.04);
       camera.position.y = THREE.MathUtils.lerp(camera.position.y, yDrift, 0.04);
-      camera.lookAt(0.85, 0, -0.2);
+      camera.position.z = THREE.MathUtils.lerp(
+        camera.position.z,
+        8.4 - Math.sin(progress * Math.PI) * 0.72,
+        0.035,
+      );
+      camera.lookAt(0.75, -0.15, -0.2);
 
-      rimLight.position.copy(pulse.position).add(new THREE.Vector3(0.2, 0.1, 1.25));
+      warmLight.position.copy(activePoint).add(new THREE.Vector3(0.3, 0.2, 1.7));
+      warmLight.intensity = 15 + Math.sin(time * 0.007) * 2.5;
       renderer.render(scene, camera);
 
       if (!still) frame = window.requestAnimationFrame(renderScene);
@@ -326,6 +635,8 @@ export default function ElectricalScene() {
         if (Array.isArray(material)) material.forEach((item) => item.dispose());
         else material?.dispose();
       });
+
+      glowTexture?.dispose();
       renderer.dispose();
       renderer.domElement.remove();
     };
