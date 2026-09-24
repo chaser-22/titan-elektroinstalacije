@@ -554,13 +554,41 @@ export default function ElectricalScene() {
       });
 
       const screenMaterial = new THREE.MeshStandardMaterial({
-        color: 0x0e2432,
-        emissive: CYAN,
-        emissiveIntensity: 0.12,
-        roughness: 0.2,
+        color: 0x07131a,
+        emissive: 0x1b7f95,
+        emissiveIntensity: 0.025,
+        metalness: 0.08,
+        roughness: 0.32,
       });
-      const plcScreen = box(0.52, 0.28, 0.035, screenMaterial, [0.09, 0.18, 0.4]);
-      plc.add(plcScreen);
+      const screenLineMaterial = new THREE.MeshBasicMaterial({
+        color: CYAN,
+        transparent: true,
+        opacity: 0.08,
+        depthWrite: false,
+      });
+
+      const plcScreenBezel = box(
+        0.54,
+        0.28,
+        0.028,
+        blackPlastic,
+        [0.09, 0.18, 0.401],
+      );
+      const plcScreen = box(
+        0.38,
+        0.14,
+        0.022,
+        screenMaterial,
+        [0.09, 0.18, 0.422],
+      );
+      const plcScreenLine = box(
+        0.22,
+        0.014,
+        0.012,
+        screenLineMaterial,
+        [0.09, 0.18, 0.438],
+      );
+      plc.add(plcScreenBezel, plcScreen, plcScreenLine);
 
       const ioModules: any[] = [];
       const ioCount = mobile ? 3 : 4;
@@ -1273,15 +1301,19 @@ export default function ElectricalScene() {
             terminalLive * wave * (mobile ? 0.014 : 0.022);
         });
 
-        // PLC screen comes fully alive later than the housing.
-        const plcLive = easeProgress(0.28, 0.44, progress);
-        const screenFlicker = reducedMotion.matches
+        // PLC display activates softly without flashing into a bright flat panel.
+        const plcLive = easeProgress(0.28, 0.5, progress);
+        const screenPulse = reducedMotion.matches
           ? 0
-          : Math.sin(time * 0.013) * 0.07 + Math.sin(time * 0.0031) * 0.08;
+          : (0.5 + Math.sin(time * 0.0018) * 0.5) * 0.035;
         screenMaterial.emissiveIntensity =
-          0.08 + plcLive * (0.82 + screenFlicker);
-        plcScreen.position.z =
-          0.4 + plcLive * (reducedMotion.matches ? 0 : Math.sin(time * 0.0018) * 0.008);
+          0.025 + plcLive * (0.16 + screenPulse);
+        screenLineMaterial.opacity =
+          0.04 + plcLive * (0.16 + screenPulse * 0.8);
+        plcScreen.scale.setScalar(1);
+        plcScreenLine.scale.x =
+          0.72 + plcLive * 0.28 +
+          (reducedMotion.matches ? 0 : Math.sin(time * 0.0014) * 0.035);
 
         // The main breaker physically switches on, then holds a tiny energized vibration.
         const breakerLive = easeProgress(0.08, 0.2, progress);
