@@ -56,6 +56,16 @@ function BoltMark() {
   );
 }
 
+function InstagramIcon() {
+  return (
+    <svg aria-hidden="true" className="instagram-icon" viewBox="0 0 24 24">
+      <rect x="3.25" y="3.25" width="17.5" height="17.5" rx="5" />
+      <circle cx="12" cy="12" r="4.1" />
+      <circle cx="17.3" cy="6.8" r="1" className="instagram-icon__dot" />
+    </svg>
+  );
+}
+
 export default function Home() {
   return (
     <>
@@ -159,20 +169,44 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="work section section--glass" id="radovi">
+        <section className="work work--transparent section" id="radovi">
           <div className="section-kicker"><p>RADOVI / SIGNAL</p></div>
-          <div className="section-heading">
+          <div className="section-heading work__heading">
             <h2>Rezultat se vidi.<br /><em>Standard ostaje.</em></h2>
-            <a className="text-link" href="https://www.instagram.com/elektroinstalacije_titan/" target="_blank" rel="noreferrer">
-              Instagram <ArrowIcon />
+            <a
+              className="work__instagram"
+              href="https://www.instagram.com/elektroinstalacije_titan/"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Titan Elektroinstalacije na Instagramu"
+            >
+              <InstagramIcon />
+              <span>Instagram</span>
+              <ArrowIcon />
             </a>
           </div>
 
-          <div className="work-strip">
-            <article className="work-panel work-panel--wide"><strong>RAZVOD</strong><p>Precizno organizovana tabla i jasna logika instalacije.</p></article>
-            <article className="work-panel"><strong>RASVJETA</strong><p>Funkcija, atmosfera i čista završna montaža.</p></article>
-            <article className="work-panel"><strong>SMART</strong><p>Kontrola sistema bez nepotrebne komplikacije.</p></article>
-            <article className="work-panel work-panel--wide"><strong>ADAPTACIJA</strong><p>Nova instalacija unutar postojećeg prostora, bez haosa.</p></article>
+          <div className="work-strip work-strip--transparent">
+            <article className="work-panel work-panel--wide">
+              <div className="work-panel__meta"><i /><span>TABLA / ZAŠTITA</span></div>
+              <strong>RAZVOD</strong>
+              <p>Precizno organizovana tabla i jasna logika instalacije.</p>
+            </article>
+            <article className="work-panel">
+              <div className="work-panel__meta"><i /><span>SVJETLO / AMBIJENT</span></div>
+              <strong>RASVJETA</strong>
+              <p>Funkcija, atmosfera i čista završna montaža.</p>
+            </article>
+            <article className="work-panel">
+              <div className="work-panel__meta"><i /><span>AUTOMATIKA / KONTROLA</span></div>
+              <strong>SMART</strong>
+              <p>Kontrola sistema bez nepotrebne komplikacije.</p>
+            </article>
+            <article className="work-panel work-panel--wide">
+              <div className="work-panel__meta"><i /><span>REKONSTRUKCIJA / FINIŠ</span></div>
+              <strong>ADAPTACIJA</strong>
+              <p>Nova instalacija unutar postojećeg prostora, bez haosa.</p>
+            </article>
           </div>
         </section>
 
