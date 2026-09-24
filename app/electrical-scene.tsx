@@ -1091,9 +1091,9 @@ export default function ElectricalScene() {
         // One deterministic cabinet transform for the whole scroll range.
         const firstHalf = easeProgress(0, 0.52, progress);
         const secondHalf = easeProgress(0.52, 1, progress);
-        const startX = mobile ? 0.72 : 1.15;
-        const middleX = mobile ? 0.14 : 0.46;
-        const endX = mobile ? 0.38 : 0.76;
+        const startX = mobile ? 1.18 : 2.08;
+        const middleX = mobile ? 0.94 : 1.84;
+        const endX = mobile ? 1.08 : 2.14;
         const baseX = THREE.MathUtils.lerp(
           THREE.MathUtils.lerp(startX, middleX, firstHalf),
           endX,
@@ -1120,8 +1120,8 @@ export default function ElectricalScene() {
         const idleCabinet =
           reducedMotion.matches ? 0 : Math.sin(time * 0.00032) * (mobile ? 0.012 : 0.018);
         const baseScale = THREE.MathUtils.lerp(
-          mobile ? 0.78 : 0.92,
-          mobile ? 0.87 : 1.02,
+          mobile ? 0.7 : 0.87,
+          mobile ? 0.79 : 0.97,
           easeProgress(0.05, 0.58, progress),
         );
 
@@ -1305,7 +1305,8 @@ export default function ElectricalScene() {
           particles.position.y = Math.sin(time * 0.00045) * 0.18;
           orbitGroup.rotation.z =
             Math.sin(time * 0.00028) * 0.12 + progress * 0.18;
-          ambientRig.position.x = Math.sin(time * 0.00019) * 0.08;
+          ambientRig.position.x =
+            (mobile ? 0.58 : 1.08) + Math.sin(time * 0.00019) * 0.08;
           ambientRig.position.y =
             Math.cos(time * 0.00017) * 0.06 + Math.sin(progress * Math.PI) * 0.08;
         }
@@ -1334,7 +1335,7 @@ export default function ElectricalScene() {
         );
 
         camera.lookAt(
-          mobile ? 0.45 : 0.72,
+          mobile ? 0.24 : 0.6,
           -0.12 + Math.sin(progress * Math.PI) * 0.12,
           -0.12,
         );
