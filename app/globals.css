@@ -375,7 +375,8 @@ h1 em, h2 em { color: var(--yellow); font-style: normal; }
   gap: clamp(30px, 7vw, 120px);
   padding: 30px 32px 32px;
   overflow: hidden;
-  background: transparent;
+  background:
+    linear-gradient(90deg, rgba(8,13,26,.36), rgba(8,13,26,.16) 62%, rgba(8,13,26,.035));
   border-bottom: 1px solid rgba(255,255,255,.15);
   transition:
     background .3s ease,
@@ -411,6 +412,11 @@ h1 em, h2 em { color: var(--yellow); font-style: normal; }
 }
 .work-panel:hover::before { height: 88px; }
 .work-panel > * { position: relative; z-index: 2; }
+.work h2,
+.work-panel strong,
+.work-panel p {
+  text-shadow: 0 2px 24px rgba(3,6,12,.72);
+}
 .work-panel__meta {
   grid-column: 1 / -1;
   display: flex;
@@ -749,7 +755,8 @@ footer > a:last-child { display: flex; min-height: 44px; align-items: center; ju
     min-height: 220px;
     gap: 12px;
     padding: 24px 20px 28px;
-    background: rgba(8,13,26,.035);
+    background:
+      linear-gradient(90deg, rgba(8,13,26,.4), rgba(8,13,26,.17) 68%, rgba(8,13,26,.03));
   }
 
   .work--transparent .work-panel__meta,
@@ -778,7 +785,8 @@ footer > a:last-child { display: flex; min-height: 44px; align-items: center; ju
 
 @media (max-width: 520px) {
   .work--transparent .work-panel {
-    background: transparent;
+    background:
+      linear-gradient(90deg, rgba(8,13,26,.42), rgba(8,13,26,.15) 72%, rgba(8,13,26,.025));
   }
 }
 
