@@ -543,3 +543,32 @@ footer > a:last-child { display: flex; min-height: 44px; align-items: center; ju
     background: linear-gradient(145deg, rgba(23,31,50,.82), rgba(13,20,35,.72));
   }
 }
+
+/* PLC / automation experiment */
+.three-scene--plc {
+  filter: saturate(1.12) contrast(1.05) brightness(1.03);
+}
+
+.three-scene--plc::after {
+  background:
+    radial-gradient(circle at 70% 46%, transparent 0 33%, rgba(8,13,26,.06) 56%, rgba(8,13,26,.18) 100%),
+    linear-gradient(90deg, rgba(8,13,26,.91) 0 26%, rgba(8,13,26,.5) 46%, rgba(8,13,26,.08) 67%, transparent 84%);
+}
+
+@media (max-width: 760px) {
+  .three-scene--plc {
+    filter: saturate(1.18) contrast(1.07) brightness(1.07);
+  }
+
+  .three-scene--plc::after {
+    background:
+      linear-gradient(180deg, rgba(8,13,26,.04) 0 40%, rgba(8,13,26,.13) 72%, rgba(8,13,26,.26) 100%),
+      linear-gradient(90deg, rgba(8,13,26,.78) 0 28%, rgba(8,13,26,.44) 49%, rgba(8,13,26,.08) 72%, transparent 100%);
+  }
+
+  .hero {
+    background:
+      radial-gradient(circle at 77% 47%, rgba(244,183,0,.055), transparent 34%),
+      linear-gradient(90deg, rgba(8,13,26,.88) 0 24%, rgba(8,13,26,.5) 48%, rgba(8,13,26,.06) 72%, transparent 100%);
+  }
+}
