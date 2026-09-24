@@ -101,15 +101,15 @@ export default function Home() {
               <a className="text-link" href="#usluge">Istražite sistem <span aria-hidden="true">↓</span></a>
             </div>
             <div className="hero__disciplines" aria-label="Oblasti rada">
-              <span>JAKA STRUJA</span><span>SLABA STRUJA</span><span>ADAPTACIJE</span>
+              <span>JAKA STRUJA</span><span>SLABA STRUJA</span><span>AUTOMATIKA</span>
             </div>
           </div>
 
           <aside className="hero__hud" aria-label="Vizuelni prikaz Titan sistema">
             <div className="hud-card hud-card--top">
-              <span className="hud-label">SISTEM AKTIVAN</span>
+              <span className="hud-label">PLC / RAZVOD AKTIVAN</span>
               <strong>220<span>V</span></strong>
-              <small>SKROLUJ / USMJERI ENERGIJU</small>
+              <small>SKROLUJ / POVEŽI SISTEM</small>
             </div>
             <div className="hud-card hud-card--bottom">
               <span>JAKA STRUJA</span><i />
