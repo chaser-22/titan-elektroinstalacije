@@ -153,9 +153,9 @@ export default function ElectricalScene() {
         roughness: 0.32,
       });
       const moduleMaterial = new THREE.MeshStandardMaterial({
-        color: MODULE,
-        metalness: 0.5,
-        roughness: 0.34,
+        color: 0x202938,
+        metalness: 0.42,
+        roughness: 0.4,
       });
       const blackPlastic = new THREE.MeshStandardMaterial({
         color: 0x0d121d,
@@ -260,7 +260,7 @@ export default function ElectricalScene() {
         new THREE.MeshBasicMaterial({
           color: 0x31415a,
           transparent: true,
-          opacity: 0.08,
+          opacity: 0.05,
           blending: THREE.AdditiveBlending,
         }),
         [0.7, -0.1, -0.36],
@@ -310,11 +310,54 @@ export default function ElectricalScene() {
           new THREE.MeshBasicMaterial({
             color: 0xaab5c7,
             transparent: true,
-            opacity: 0.4,
+            opacity: 0.22,
           }),
           [0.7, y, 0.295],
         );
         panelRig.add(railLine);
+      });
+
+      // Wire ducts keep control wiring visually organized between DIN rails.
+      const wireDuctMaterial = new THREE.MeshStandardMaterial({
+        color: 0x111925,
+        metalness: 0.12,
+        roughness: 0.62,
+      });
+      const ductEdgeMaterial = new THREE.MeshBasicMaterial({
+        color: 0x69758a,
+        transparent: true,
+        opacity: 0.16,
+      });
+      const ductYs = [1.48, -0.38, -2.2];
+
+      ductYs.forEach((y) => {
+        const duct = box(5.0, 0.24, 0.28, wireDuctMaterial, [0.7, y, 0.34]);
+        panelRig.add(duct);
+
+        panelRig.add(
+          box(5.0, 0.018, 0.035, ductEdgeMaterial, [0.7, y + 0.12, 0.49]),
+        );
+        panelRig.add(
+          box(5.0, 0.018, 0.035, ductEdgeMaterial, [0.7, y - 0.12, 0.49]),
+        );
+
+        const slotCount = mobile ? 12 : 18;
+        for (let index = 0; index < slotCount; index += 1) {
+          const slotX = -1.58 + index * (4.56 / Math.max(1, slotCount - 1));
+          panelRig.add(
+            box(
+              0.055,
+              0.12,
+              0.025,
+              new THREE.MeshBasicMaterial({
+                color: 0x050912,
+                transparent: true,
+                opacity: 0.72,
+              }),
+              [slotX, y, 0.495],
+            ),
+          );
+        }
       });
 
       // Copper busbars.
@@ -340,7 +383,7 @@ export default function ElectricalScene() {
           roughness: 0.16,
           metalness: 0.02,
           transparent: true,
-          opacity: 0.14,
+          opacity: 0.1,
           transmission: mobile ? 0 : 0.25,
           depthWrite: false,
         }),
@@ -442,11 +485,11 @@ export default function ElectricalScene() {
           roughness: 0.32,
         });
         const stripe = box(
-          size[0] * 0.14,
+          size[0] * 0.1,
           size[1] * 0.76,
           0.045,
           stripeMaterial,
-          [-size[0] * 0.34, 0, size[2] / 2 + 0.05],
+          [-size[0] * 0.36, 0, size[2] / 2 + 0.05],
         );
         group.add(stripe);
 
@@ -649,20 +692,22 @@ export default function ElectricalScene() {
         ledCount: 2,
       });
 
-      // 3D labels floating just above the rails.
+      // Restrained zone labels: enough orientation without visual clutter.
       [
-        ["NAPAJANJE", -0.7, 3.18, "#f4b700"],
-        ["UPRAVLJANJE", 1.8, 3.18, "#dce5f4"],
-        ["IZLAZI", 2.7, -0.55, "#50d8ff"],
+        ["NAPAJANJE", -0.72, 3.18, "#f4b700"],
+        ["UPRAVLJANJE", 1.62, 3.18, "#dce5f4"],
       ].forEach(([text, x, y, color]) => {
         const label = addLabel(
           panelRig,
           String(text),
-          mobile ? 1.05 : 1.2,
+          mobile ? 0.86 : 1.0,
           [Number(x), Number(y), 0.28],
           String(color),
         );
-        if (label) labelTextures.push(label.texture);
+        if (label) {
+          label.sprite.material.opacity = 0.72;
+          labelTextures.push(label.texture);
+        }
       });
 
       // Cable construction.
@@ -691,9 +736,14 @@ export default function ElectricalScene() {
         curve.tension = 0.36;
 
         const baseMaterial = new THREE.MeshStandardMaterial({
-          color: color === YELLOW ? 0x6c5816 : color === BLUE ? 0x172a5c : 0x252b38,
-          roughness: 0.42,
-          metalness: 0.15,
+          color:
+            color === YELLOW
+              ? 0x514719
+              : color === BLUE || color === CYAN
+                ? 0x17243f
+                : 0x242a35,
+          roughness: 0.52,
+          metalness: 0.1,
         });
 
         const tube = new THREE.Mesh(
@@ -739,7 +789,7 @@ export default function ElectricalScene() {
               map: glowTexture,
               color: color === BLUE ? BLUE : YELLOW,
               transparent: true,
-              opacity: 0.68,
+              opacity: 0.5,
               blending: THREE.AdditiveBlending,
               depthWrite: false,
             }),
@@ -769,11 +819,11 @@ export default function ElectricalScene() {
       // Mains cables entering from the bottom and feeding the breaker / bus.
       createCable({
         points: [
-          [-1.38, -5.2, 1.0],
-          [-1.38, -3.15, 0.86],
-          [-1.44, 0.2, 0.78],
-          [-1.36, 1.65, 0.78],
-          [-1.35, 2.0, 0.82],
+          [-1.38, -5.2, 0.92],
+          [-1.38, -3.18, 0.8],
+          [-1.38, -2.2, 0.72],
+          [-1.38, 1.48, 0.72],
+          [-1.35, 2.0, 0.8],
         ],
         color: YELLOW,
         start: 0.0,
@@ -783,11 +833,11 @@ export default function ElectricalScene() {
 
       createCable({
         points: [
-          [-1.16, -5.2, 0.98],
-          [-1.18, -3.05, 0.84],
-          [-1.16, 0.05, 0.76],
-          [-1.08, 1.7, 0.76],
-          [-0.72, 2.15, 0.82],
+          [-1.16, -5.2, 0.9],
+          [-1.16, -3.18, 0.78],
+          [-1.16, -2.2, 0.7],
+          [-1.16, 1.48, 0.7],
+          [-0.72, 2.15, 0.8],
         ],
         color: BLUE,
         start: 0.03,
@@ -798,10 +848,10 @@ export default function ElectricalScene() {
       // Breaker -> PSU -> PLC power.
       createCable({
         points: [
-          [-0.95, 2.7, 0.92],
-          [-0.7, 3.0, 0.95],
-          [-0.25, 2.95, 0.92],
-          [-0.05, 2.72, 0.88],
+          [-0.95, 2.68, 0.86],
+          [-0.95, 1.66, 0.75],
+          [-0.05, 1.48, 0.72],
+          [-0.05, 2.72, 0.86],
         ],
         color: YELLOW,
         start: 0.14,
@@ -811,10 +861,10 @@ export default function ElectricalScene() {
 
       createCable({
         points: [
-          [0.05, 2.65, 0.92],
-          [0.2, 2.98, 0.96],
-          [0.68, 3.02, 0.96],
-          [0.7, 2.78, 0.95],
+          [0.05, 2.64, 0.86],
+          [0.05, 1.62, 0.74],
+          [0.7, 1.48, 0.72],
+          [0.7, 2.78, 0.88],
         ],
         color: YELLOW,
         start: 0.23,
@@ -826,10 +876,10 @@ export default function ElectricalScene() {
       for (let index = 0; index < ioCount; index += 1) {
         createCable({
           points: [
-            [1.18, 2.47, 0.95],
-            [1.3 + index * 0.34, 2.84, 0.98],
-            [1.52 + index * 0.48, 2.82, 0.96],
-            [1.55 + index * 0.48, 2.62, 0.92],
+            [1.18, 2.47, 0.9],
+            [1.18, 1.58, 0.74],
+            [1.55 + index * 0.48, 1.48, 0.72],
+            [1.55 + index * 0.48, 2.62, 0.88],
           ],
           color: index % 2 === 0 ? BLUE : CYAN,
           start: 0.34 + index * 0.035,
@@ -845,10 +895,10 @@ export default function ElectricalScene() {
         const targetX = -0.62 + index * 0.92;
         createCable({
           points: [
-            [sourceX, 1.88, 0.9],
-            [sourceX, 1.55, 1.15],
-            [targetX, 1.25, 1.13],
-            [targetX, 1.02, 0.9],
+            [sourceX, 1.88, 0.86],
+            [sourceX, 1.48, 0.74],
+            [targetX, -0.38, 0.72],
+            [targetX, 1.02, 0.86],
           ],
           color: index % 2 ? BLUE : YELLOW,
           start: 0.46 + index * 0.035,
@@ -859,7 +909,7 @@ export default function ElectricalScene() {
       }
 
       // Contactors and network fan down to terminal row.
-      const outputCableCount = mobile ? 6 : 9;
+      const outputCableCount = phone ? 4 : mobile ? 5 : 6;
       for (let index = 0; index < outputCableCount; index += 1) {
         const sourceX =
           index === outputCableCount - 1
@@ -873,19 +923,17 @@ export default function ElectricalScene() {
 
         createCable({
           points: [
-            [sourceX, 0.08, 0.86],
-            [sourceX, -0.4, 1.08],
-            [targetX, -0.65, 1.06],
-            [targetX, -1.0, 0.82],
+            [sourceX, 0.08, 0.84],
+            [sourceX, -0.38, 0.72],
+            [targetX, -0.38, 0.72],
+            [targetX, -1.0, 0.8],
           ],
           color:
             index === outputCableCount - 1
               ? CYAN
-              : index % 3 === 0
+              : index % 2 === 0
                 ? YELLOW
-                : index % 3 === 1
-                  ? BLUE
-                  : RED,
+                : BLUE,
           start: 0.58 + index * 0.018,
           end: 0.79 + index * 0.018,
           radius: mobile ? 0.044 : 0.035,
@@ -894,7 +942,7 @@ export default function ElectricalScene() {
       }
 
       // Terminal row out through cable glands.
-      const outgoingCount = mobile ? 5 : 7;
+      const outgoingCount = phone ? 4 : mobile ? 5 : 6;
       for (let index = 0; index < outgoingCount; index += 1) {
         const terminalIndex = Math.round(
           (index / Math.max(1, outgoingCount - 1)) * (detail.terminalCount - 1),
@@ -906,12 +954,12 @@ export default function ElectricalScene() {
         createCable({
           points: [
             [sourceX, -1.64, 0.8],
-            [sourceX, -2.0, 1.0],
-            [targetX + 0.72, -2.45, 1.02],
+            [sourceX, -2.2, 0.72],
+            [targetX + 0.72, -2.2, 0.72],
             [targetX + 0.72, -3.0, 0.78],
-            [targetX + 0.72, -4.85, 0.96],
+            [targetX + 0.72, -4.85, 0.9],
           ],
-          color: index % 3 === 0 ? YELLOW : index % 3 === 1 ? BLUE : RED,
+          color: index % 2 === 0 ? YELLOW : BLUE,
           start: 0.72 + index * 0.018,
           end: 0.92 + index * 0.012,
           radius: mobile ? 0.052 : 0.042,
@@ -922,7 +970,7 @@ export default function ElectricalScene() {
       // Ambient wireframe field for depth / Spline-like product presentation.
       const orbitGroup = new THREE.Group();
       ambientRig.add(orbitGroup);
-      const orbitCount = mobile ? 3 : 5;
+      const orbitCount = mobile ? 2 : 3;
 
       for (let index = 0; index < orbitCount; index += 1) {
         const ring = new THREE.Mesh(
@@ -935,7 +983,7 @@ export default function ElectricalScene() {
           new THREE.MeshBasicMaterial({
             color: index % 2 === 0 ? YELLOW : STEEL,
             transparent: true,
-            opacity: index === 0 ? 0.2 : 0.08,
+            opacity: index === 0 ? 0.12 : 0.045,
             blending: THREE.AdditiveBlending,
             depthWrite: false,
           }),
@@ -973,7 +1021,7 @@ export default function ElectricalScene() {
           color: 0x7b879d,
           size: mobile ? 0.025 : 0.022,
           transparent: true,
-          opacity: 0.42,
+          opacity: 0.24,
           sizeAttenuation: true,
         }),
       );
@@ -1273,7 +1321,7 @@ export default function ElectricalScene() {
           scanBeam.position.y = -3.48 + scanPhase * 6.95;
           scanMaterial.opacity =
             scanLive *
-            (0.08 + Math.sin(scanPhase * Math.PI) * (mobile ? 0.16 : 0.24));
+            (0.05 + Math.sin(scanPhase * Math.PI) * (mobile ? 0.1 : 0.16));
         } else {
           scanMaterial.opacity = reducedMotion.matches ? scanLive * 0.08 : 0;
         }
