@@ -67,10 +67,10 @@ export default function ElectricalScene() {
 
       const detail = mobile
         ? {
-            cableSegments: phone ? 34 : 42,
-            cableRadial: phone ? 5 : 6,
-            particles: phone ? 44 : 70,
-            maxPixelRatio: phone ? 1.0 : 1.15,
+            cableSegments: phone ? 44 : 44,
+            cableRadial: 6,
+            particles: phone ? 34 : 54,
+            maxPixelRatio: phone ? 1.5 : 1.35,
             targetFrameMs: 1000 / 40,
             terminalCount: phone ? 7 : 8,
           }
@@ -96,7 +96,7 @@ export default function ElectricalScene() {
 
       const renderer = new THREE.WebGLRenderer({
         alpha: true,
-        antialias: !mobile,
+        antialias: true,
         powerPreference: "high-performance",
       });
       renderer.setClearColor(0x000000, 0);
@@ -1137,9 +1137,9 @@ export default function ElectricalScene() {
           Math.min(
             window.devicePixelRatio,
             width < 520
-              ? 1.0
+              ? 1.5
               : width < 820 || coarsePointer.matches
-                ? 1.15
+                ? 1.35
                 : detail.maxPixelRatio,
           ),
         );
