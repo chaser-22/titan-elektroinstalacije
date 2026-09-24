@@ -1089,7 +1089,7 @@ export default function ElectricalScene() {
         lastRenderTime = time;
 
         if (!reducedMotion.matches) {
-          const smoothing = 1 - Math.exp(-delta / (mobile ? 105 : 125));
+          const smoothing = 1 - Math.exp(-delta / (phone ? 82 : mobile ? 105 : 125));
           scrollState.progress = THREE.MathUtils.lerp(
             scrollState.progress,
             scrollState.target,
@@ -1328,7 +1328,7 @@ export default function ElectricalScene() {
         const idleX = reducedMotion.matches ? 0 : Math.sin(time * 0.00018) * 0.08;
         const idleY = reducedMotion.matches ? 0 : Math.cos(time * 0.00016) * 0.045;
 
-        const cameraEase = 1 - Math.exp(-delta / (mobile ? 120 : 100));
+        const cameraEase = 1 - Math.exp(-delta / (phone ? 92 : mobile ? 120 : 100));
         camera.position.x = THREE.MathUtils.lerp(
           camera.position.x,
           pointerX * 0.18 * pointerFactor + idleX,
