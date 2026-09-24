@@ -29,6 +29,8 @@ type StatusModule = {
   group: any;
   leds: any[];
   start: number;
+  basePosition: any;
+  phase: number;
 };
 
 export default function ElectricalScene() {
@@ -306,6 +308,7 @@ export default function ElectricalScene() {
       });
 
       // Copper busbars.
+      const busBars: any[] = [];
       [-1.87, -1.66, -1.45].forEach((x, index) => {
         const bar = box(
           0.11,
@@ -315,6 +318,7 @@ export default function ElectricalScene() {
           [x, 0.12, 0.34 + index * 0.015],
         );
         panelRig.add(bar);
+        busBars.push(bar);
       });
 
       const busCover = box(
@@ -333,6 +337,20 @@ export default function ElectricalScene() {
         [-1.66, 0.12, 0.51],
       );
       panelRig.add(busCover);
+
+      const busLight = new THREE.PointLight(YELLOW, 0, 4.5, 2);
+      busLight.position.set(-1.66, 0.15, 1.0);
+      panelRig.add(busLight);
+
+      const scanMaterial = new THREE.MeshBasicMaterial({
+        color: CYAN,
+        transparent: true,
+        opacity: 0,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+      });
+      const scanBeam = box(4.95, 0.026, 0.025, scanMaterial, [0.76, -3.55, 0.5]);
+      panelRig.add(scanBeam);
 
       const glowTexture = (() => {
         const canvas = document.createElement("canvas");
@@ -444,7 +462,15 @@ export default function ElectricalScene() {
         if (label) labelTextures.push(label.texture);
 
         panelRig.add(group);
-        statusModules.push({ group, leds, start });
+        group.userData.basePosition = group.position.clone();
+        group.userData.phase = statusModules.length * 0.83;
+        statusModules.push({
+          group,
+          leds,
+          start,
+          basePosition: group.position.clone(),
+          phase: statusModules.length * 0.83,
+        });
         return group;
       };
 
@@ -941,7 +967,8 @@ export default function ElectricalScene() {
       ambientRig.add(particles);
 
       // State used by GSAP ScrollTrigger and render loop.
-      const scrollState = { progress: 0 };
+      // ScrollTrigger provides the target; the render loop performs the final interpolation.
+      const scrollState = { progress: 0, target: 0 };
       let pointerX = 0;
       let pointerY = 0;
       let frame = 0;
@@ -1002,18 +1029,12 @@ export default function ElectricalScene() {
           trigger: "#glavni-sadrzaj",
           start: "top top",
           end: "bottom bottom",
-          scrub: reducedMotion.matches ? false : 0.9,
+          scrub: reducedMotion.matches ? false : mobile ? 1.15 : 1.35,
           invalidateOnRefresh: true,
           onUpdate: (self: any) => {
+            scrollState.target = self.progress;
             if (reducedMotion.matches) {
               scrollState.progress = self.progress;
-            } else {
-              gsap.to(scrollState, {
-                progress: self.progress,
-                duration: 0.34,
-                ease: "power2.out",
-                overwrite: true,
-              });
             }
           },
         },
@@ -1119,7 +1140,20 @@ export default function ElectricalScene() {
           frame = window.requestAnimationFrame(render);
           return;
         }
+
+        const delta = lastRenderTime
+          ? Math.min(64, Math.max(1, time - lastRenderTime))
+          : 16.7;
         lastRenderTime = time;
+
+        if (!reducedMotion.matches) {
+          const smoothing = 1 - Math.exp(-delta / (mobile ? 105 : 125));
+          scrollState.progress = THREE.MathUtils.lerp(
+            scrollState.progress,
+            scrollState.target,
+            smoothing,
+          );
+        }
 
         const progress = scrollState.progress;
 
@@ -1151,9 +1185,24 @@ export default function ElectricalScene() {
           }
         });
 
-        // Module boot state / LEDs.
+        // Module boot state / LEDs + subtle energized mechanical motion.
         statusModules.forEach((module, moduleIndex) => {
           const live = easeProgress(module.start, module.start + 0.1, progress);
+          const breathe = reducedMotion.matches
+            ? 0
+            : Math.sin(time * 0.0014 + module.phase) * live;
+
+          module.group.position.x =
+            module.basePosition.x + breathe * (mobile ? 0.004 : 0.007);
+          module.group.position.y =
+            module.basePosition.y + breathe * (mobile ? 0.005 : 0.009);
+          module.group.position.z =
+            module.basePosition.z +
+            live * (mobile ? 0.025 : 0.04) +
+            breathe * (mobile ? 0.012 : 0.018);
+          module.group.rotation.y =
+            breathe * (mobile ? 0.006 : 0.012);
+
           module.leds.forEach((led: any, ledIndex: number) => {
             const material = led.material;
             const pulse =
@@ -1165,21 +1214,100 @@ export default function ElectricalScene() {
 
         const terminalLive = easeProgress(0.64, 0.84, progress);
         terminalMeshes.forEach((terminal: any, index: number) => {
+          const wave = Math.max(
+            0,
+            Math.sin(time * 0.0055 - index * 0.72),
+          );
           terminal.material.emissiveIntensity =
-            0.01 +
-            terminalLive *
-              (0.12 + Math.max(0, Math.sin(time * 0.005 + index * 0.7)) * 0.28);
+            0.01 + terminalLive * (0.1 + wave * 0.38);
+          terminal.position.z =
+            terminalLive * wave * (mobile ? 0.014 : 0.022);
         });
 
         // PLC screen comes fully alive later than the housing.
         const plcLive = easeProgress(0.28, 0.44, progress);
+        const screenFlicker = reducedMotion.matches
+          ? 0
+          : Math.sin(time * 0.013) * 0.07 + Math.sin(time * 0.0031) * 0.08;
         screenMaterial.emissiveIntensity =
-          0.08 + plcLive * (0.75 + Math.sin(time * 0.004) * 0.2);
+          0.08 + plcLive * (0.82 + screenFlicker);
+        plcScreen.position.z =
+          0.4 + plcLive * (reducedMotion.matches ? 0 : Math.sin(time * 0.0018) * 0.008);
 
-        // The main breaker physically switches on.
+        // The main breaker physically switches on, then holds a tiny energized vibration.
         const breakerLive = easeProgress(0.08, 0.2, progress);
-        breakerToggle.rotation.x = -0.28 * breakerLive;
-        breakerToggle.position.y = 0.08 + breakerLive * 0.08;
+        const breakerHum =
+          !reducedMotion.matches && breakerLive > 0.98
+            ? Math.sin(time * 0.011) * (mobile ? 0.004 : 0.006)
+            : 0;
+        breakerToggle.rotation.x = -0.28 * breakerLive + breakerHum;
+        breakerToggle.position.y = 0.08 + breakerLive * 0.08 + breakerHum * 0.35;
+
+        // Energized busbar, moving scan and local power glow.
+        const busLive = easeProgress(0.12, 0.36, progress);
+        copper.emissiveIntensity =
+          0.12 +
+          busLive *
+            (0.52 +
+              (reducedMotion.matches ? 0 : Math.sin(time * 0.0042) * 0.12));
+        busLight.intensity =
+          busLive *
+          ((mobile ? 4.5 : 7) +
+            (reducedMotion.matches ? 0 : Math.max(0, Math.sin(time * 0.0048)) * 2));
+        busCover.material.opacity = 0.14 + busLive * 0.07;
+
+        const scanLive = easeProgress(0.28, 0.9, progress);
+        if (!reducedMotion.matches && scanLive > 0.01) {
+          const scanPhase = (time * 0.00016 + progress * 0.32) % 1;
+          scanBeam.position.y = -3.48 + scanPhase * 6.95;
+          scanMaterial.opacity =
+            scanLive *
+            (0.08 + Math.sin(scanPhase * Math.PI) * (mobile ? 0.16 : 0.24));
+        } else {
+          scanMaterial.opacity = reducedMotion.matches ? scanLive * 0.08 : 0;
+        }
+
+        // Relay / contactor mechanics: a small periodic click after each circuit is live.
+        relayGroups.forEach((relay: any, index: number) => {
+          const base = relay.userData.basePosition;
+          const live = easeProgress(
+            0.48 + index * 0.045,
+            0.58 + index * 0.045,
+            progress,
+          );
+          const phase = (time * 0.00042 + index * 0.19) % 1;
+          const click =
+            !reducedMotion.matches && phase < 0.08
+              ? Math.sin((phase / 0.08) * Math.PI) * live
+              : 0;
+          relay.position.z =
+            base.z + live * (mobile ? 0.02 : 0.035) + click * (mobile ? 0.028 : 0.05);
+          relay.rotation.x = click * 0.045;
+        });
+
+        // I/O modules ripple as signals fan out.
+        ioModules.forEach((module: any, index: number) => {
+          const base = module.userData.basePosition;
+          const live = easeProgress(
+            0.38 + index * 0.045,
+            0.5 + index * 0.045,
+            progress,
+          );
+          const ripple = reducedMotion.matches
+            ? 0
+            : Math.sin(time * 0.0022 - index * 0.72) * live;
+          module.position.z =
+            base.z + live * (mobile ? 0.025 : 0.045) + ripple * (mobile ? 0.012 : 0.02);
+          module.rotation.z = ripple * 0.008;
+        });
+
+        // PSU and network module stay subtly active once powered.
+        const psuLive = easeProgress(0.2, 0.34, progress);
+        psu.rotation.z =
+          reducedMotion.matches ? 0 : Math.sin(time * 0.0017) * psuLive * 0.006;
+        const networkLive = easeProgress(0.58, 0.72, progress);
+        networkPort.rotation.y =
+          reducedMotion.matches ? 0 : Math.sin(time * 0.0015) * networkLive * 0.012;
 
         // Ambient cabinet motion stays subtle; scroll remains dominant.
         if (!reducedMotion.matches) {
@@ -1289,7 +1417,6 @@ export default function ElectricalScene() {
         scrollTimeline.scrollTrigger?.kill();
         scrollTimeline.kill();
         idleTweens.forEach((tween) => tween.kill());
-        gsap.killTweensOf(scrollState);
         gsap.killTweensOf(panelRig.position);
         gsap.killTweensOf(panelRig.rotation);
         gsap.killTweensOf(panelRig.scale);
