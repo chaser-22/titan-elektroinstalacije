@@ -1486,3 +1486,24 @@ footer > a:last-child { display: flex; min-height: 44px; align-items: center; ju
       );
   }
 }
+
+/* Center services intro copy consistently */
+.services .section-heading > p {
+  align-self: center;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+@media (max-width: 820px) {
+  .services .section-heading > p {
+    width: 100%;
+    max-width: 340px;
+  }
+}
+
+@media (max-width: 520px) {
+  .services .section-heading > p {
+    max-width: 300px;
+  }
+}
