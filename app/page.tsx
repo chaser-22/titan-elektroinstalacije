@@ -72,12 +72,18 @@ export default function Home() {
       <a className="skip-link" href="#glavni-sadrzaj">Preskoči na glavni sadržaj</a>
       <ElectricalScene />
 
-      <div className="announcement">
+      <div className="announcement" aria-label="Titan Elektroinstalacije — Crna Gora">
         <div className="announcement__track" aria-hidden="true">
-          <span>ELEKTROINSTALACIJE</span><span>•</span><span>CRNA GORA</span><span>•</span>
-          <span>JAKA I SLABA STRUJA</span><span>•</span><span>TITAN</span><span>•</span>
-          <span>ELEKTROINSTALACIJE</span><span>•</span><span>CRNA GORA</span><span>•</span>
-          <span>JAKA I SLABA STRUJA</span><span>•</span><span>TITAN</span>
+          <div className="announcement__group">
+            <span>ELEKTROINSTALACIJE</span><span>•</span><span>CRNA GORA</span><span>•</span>
+            <span>JAKA I SLABA STRUJA</span><span>•</span><span>AUTOMATIKA</span><span>•</span>
+            <span>TITAN</span><span>•</span>
+          </div>
+          <div className="announcement__group">
+            <span>ELEKTROINSTALACIJE</span><span>•</span><span>CRNA GORA</span><span>•</span>
+            <span>JAKA I SLABA STRUJA</span><span>•</span><span>AUTOMATIKA</span><span>•</span>
+            <span>TITAN</span><span>•</span>
+          </div>
         </div>
       </div>
 
