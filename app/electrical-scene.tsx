@@ -1131,10 +1131,19 @@ export default function ElectricalScene() {
         );
         const idleCabinet =
           reducedMotion.matches ? 0 : Math.sin(time * 0.00032) * (mobile ? 0.012 : 0.018);
+        const zoomIn = easeProgress(0.01, 0.32, progress);
+        const zoomOut = easeProgress(0.36, 0.72, progress);
+        const finalPush = easeProgress(0.78, 0.97, progress);
+
+        const startScale = phone ? 0.56 : mobile ? 0.64 : 0.78;
+        const peakScale = phone ? 0.78 : mobile ? 0.9 : 1.08;
+        const pulledBackScale = phone ? 0.63 : mobile ? 0.72 : 0.86;
+        const finalScale = phone ? 0.7 : mobile ? 0.8 : 0.95;
+
         const baseScale = THREE.MathUtils.lerp(
-          phone ? 0.62 : mobile ? 0.7 : 0.87,
-          phone ? 0.7 : mobile ? 0.79 : 0.97,
-          easeProgress(0.05, 0.58, progress),
+          THREE.MathUtils.lerp(startScale, peakScale, zoomIn),
+          THREE.MathUtils.lerp(pulledBackScale, finalScale, finalPush),
+          zoomOut,
         );
 
         panelRig.position.set(
@@ -1339,11 +1348,21 @@ export default function ElectricalScene() {
           -pointerY * 0.09 * pointerFactor + idleY,
           cameraEase,
         );
+        const cameraFarStart = phone ? 12.9 : mobile ? 12.35 : 10.05;
+        const cameraNear = phone ? 11.3 : mobile ? 10.85 : 8.15;
+        const cameraFarMid = phone ? 12.45 : mobile ? 11.95 : 9.65;
+        const cameraFinal = phone ? 11.85 : mobile ? 11.35 : 8.95;
+
+        const cameraZoomTarget = THREE.MathUtils.lerp(
+          THREE.MathUtils.lerp(cameraFarStart, cameraNear, zoomIn),
+          THREE.MathUtils.lerp(cameraFarMid, cameraFinal, finalPush),
+          zoomOut,
+        );
+
         camera.position.z = THREE.MathUtils.lerp(
           camera.position.z,
-          (phone ? 12.15 : mobile ? 11.7 : 9.2) -
-            Math.sin(progress * Math.PI) * (phone ? 0.34 : mobile ? 0.5 : 0.78) -
-            systemLive * (phone ? 0.08 : mobile ? 0.12 : 0.22),
+          cameraZoomTarget -
+            systemLive * (phone ? 0.06 : mobile ? 0.1 : 0.16),
           cameraEase,
         );
 
