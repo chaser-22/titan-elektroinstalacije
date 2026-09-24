@@ -21,6 +21,45 @@ export default function ElectricalScene() {
     if (!mount) return;
 
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const coarsePointer = window.matchMedia("(pointer: coarse)");
+    const mobileProfile =
+      Math.min(window.innerWidth, mount.clientWidth || window.innerWidth) < 820 ||
+      coarsePointer.matches;
+
+    const detail = mobileProfile
+      ? {
+          mainSegments: 176,
+          radialSegments: 7,
+          sampleCount: 96,
+          sheathSegments: 132,
+          sheathRadial: 9,
+          branchSegments: 72,
+          branchRadial: 6,
+          clampSegments: 18,
+          torusSegments: 30,
+          particleCount: 150,
+          arcCount: 2,
+          arcPoints: 14,
+          maxPixelRatio: 1.15,
+          targetFrameMs: 1000 / 40,
+        }
+      : {
+          mainSegments: 360,
+          radialSegments: 10,
+          sampleCount: 180,
+          sheathSegments: 300,
+          sheathRadial: 16,
+          branchSegments: 150,
+          branchRadial: 9,
+          clampSegments: 28,
+          torusSegments: 38,
+          particleCount: 420,
+          arcCount: 4,
+          arcPoints: 24,
+          maxPixelRatio: 1.65,
+          targetFrameMs: 0,
+        };
+
     const scene = new THREE.Scene();
     scene.fog = new THREE.FogExp2(DARK, 0.072);
 
@@ -29,11 +68,11 @@ export default function ElectricalScene() {
 
     const renderer = new THREE.WebGLRenderer({
       alpha: true,
-      antialias: window.devicePixelRatio < 2,
+      antialias: !mobileProfile && window.devicePixelRatio < 2,
       powerPreference: "high-performance",
     });
     renderer.setClearColor(0x000000, 0);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.65));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, detail.maxPixelRatio));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.16;
@@ -54,9 +93,11 @@ export default function ElectricalScene() {
     warmLight.position.set(2.8, 2.7, 2.8);
     scene.add(warmLight);
 
-    const blueLight = new THREE.PointLight(BLUE, 7, 8, 2);
-    blueLight.position.set(-2.8, -1.8, 1.3);
-    scene.add(blueLight);
+    if (!mobileProfile) {
+      const blueLight = new THREE.PointLight(BLUE, 7, 8, 2);
+      blueLight.position.set(-2.8, -1.8, 1.3);
+      scene.add(blueLight);
+    }
 
     const backbone = new THREE.CatmullRomCurve3([
       new THREE.Vector3(1.65, 5.0, -0.55),
@@ -73,7 +114,7 @@ export default function ElectricalScene() {
     backbone.curveType = "catmullrom";
     backbone.tension = 0.42;
 
-    const sampleCount = 180;
+    const sampleCount = detail.sampleCount;
     const frames = backbone.computeFrenetFrames(sampleCount, false);
     const cableCurves: any[] = [];
     const cableMeshes: any[] = [];
@@ -114,39 +155,65 @@ export default function ElectricalScene() {
       cableCurves.push(curve);
 
       const mesh = new THREE.Mesh(
-        new THREE.TubeGeometry(curve, 360, cableIndex === 0 ? 0.07 : 0.065, 10, false),
+        new THREE.TubeGeometry(
+          curve,
+          detail.mainSegments,
+          cableIndex === 0 ? 0.07 : 0.065,
+          detail.radialSegments,
+          false,
+        ),
         cableMaterial(color, cableIndex),
       );
       network.add(mesh);
       cableMeshes.push(mesh);
     });
 
+    const sheathMaterial = mobileProfile
+      ? new THREE.MeshStandardMaterial({
+          color: 0x8793a8,
+          metalness: 0.08,
+          roughness: 0.3,
+          transparent: true,
+          opacity: 0.065,
+          depthWrite: false,
+          side: THREE.DoubleSide,
+        })
+      : new THREE.MeshPhysicalMaterial({
+          color: 0x8793a8,
+          metalness: 0.04,
+          roughness: 0.18,
+          transmission: 0.15,
+          transparent: true,
+          opacity: 0.085,
+          depthWrite: false,
+          side: THREE.DoubleSide,
+        });
+
     const sheath = new THREE.Mesh(
-      new THREE.TubeGeometry(backbone, 300, 0.34, 16, false),
-      new THREE.MeshPhysicalMaterial({
-        color: 0x8793a8,
-        metalness: 0.04,
-        roughness: 0.18,
-        transmission: 0.15,
-        transparent: true,
-        opacity: 0.085,
-        depthWrite: false,
-        side: THREE.DoubleSide,
-      }),
+      new THREE.TubeGeometry(
+        backbone,
+        detail.sheathSegments,
+        0.34,
+        detail.sheathRadial,
+        false,
+      ),
+      sheathMaterial,
     );
     network.add(sheath);
 
-    const sheathWire = new THREE.Mesh(
-      new THREE.TubeGeometry(backbone, 260, 0.355, 8, false),
-      new THREE.MeshBasicMaterial({
-        color: 0x5f6a7e,
-        transparent: true,
-        opacity: 0.09,
-        wireframe: true,
-        depthWrite: false,
-      }),
-    );
-    network.add(sheathWire);
+    if (!mobileProfile) {
+      const sheathWire = new THREE.Mesh(
+        new THREE.TubeGeometry(backbone, 260, 0.355, 8, false),
+        new THREE.MeshBasicMaterial({
+          color: 0x5f6a7e,
+          transparent: true,
+          opacity: 0.09,
+          wireframe: true,
+          depthWrite: false,
+        }),
+      );
+      network.add(sheathWire);
+    }
 
     const clampMaterial = new THREE.MeshStandardMaterial({
       color: 0x323c50,
@@ -172,13 +239,13 @@ export default function ElectricalScene() {
       group.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), tangent);
 
       const body = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.43, 0.43, 0.16, 28, 1, false),
+        new THREE.CylinderGeometry(0.43, 0.43, 0.16, detail.clampSegments, 1, false),
         clampMaterial,
       );
       group.add(body);
 
       const edgeA = new THREE.Mesh(
-        new THREE.TorusGeometry(0.43, 0.025, 8, 38),
+        new THREE.TorusGeometry(0.43, 0.025, 7, detail.torusSegments),
         clampEdgeMaterial,
       );
       edgeA.rotation.x = Math.PI / 2;
@@ -216,7 +283,12 @@ export default function ElectricalScene() {
 
     [0.72, 0.9, 1.1].forEach((radius, index) => {
       const ring = new THREE.Mesh(
-        new THREE.TorusGeometry(radius, index === 1 ? 0.03 : 0.018, 8, 72),
+        new THREE.TorusGeometry(
+          radius,
+          index === 1 ? 0.03 : 0.018,
+          mobileProfile ? 6 : 8,
+          mobileProfile ? 42 : 72,
+        ),
         new THREE.MeshBasicMaterial({
           color: index === 1 ? YELLOW : STEEL,
           transparent: true,
@@ -287,8 +359,15 @@ export default function ElectricalScene() {
     };
 
     cableCurves.forEach((curve, cableIndex) => {
-      makePulse(curve, cableIndex * 0.13, 0.025 + cableIndex * 0.002, cableIndex === 1 ? 1.15 : 0.72);
-      makePulse(curve, 0.45 + cableIndex * 0.09, 0.021 + cableIndex * 0.0014, 0.62);
+      makePulse(
+        curve,
+        cableIndex * 0.13,
+        0.025 + cableIndex * 0.002,
+        cableIndex === 1 ? 1.15 : 0.72,
+      );
+      if (!mobileProfile) {
+        makePulse(curve, 0.45 + cableIndex * 0.09, 0.021 + cableIndex * 0.0014, 0.62);
+      }
     });
 
     const branchGroups: Array<{
@@ -328,7 +407,13 @@ export default function ElectricalScene() {
 
         const color = strandIndex === 1 ? YELLOW : strandIndex === 0 ? 0x202a3a : BLUE;
         const mesh = new THREE.Mesh(
-          new THREE.TubeGeometry(curve, 150, 0.05, 9, false),
+          new THREE.TubeGeometry(
+            curve,
+            detail.branchSegments,
+            0.05,
+            detail.branchRadial,
+            false,
+          ),
           cableMaterial(color, strandIndex === 1 ? 1 : 4),
         );
         group.add(mesh);
@@ -377,7 +462,13 @@ export default function ElectricalScene() {
       network.add(group);
 
       branchCurves.forEach((curve, curveIndex) => {
-        const pulse = makePulse(curve, branchIndex * 0.17 + curveIndex * 0.21, 0.035 + curveIndex * 0.003, 0.55);
+        if (mobileProfile && curveIndex !== 1) return;
+        const pulse = makePulse(
+          curve,
+          branchIndex * 0.17 + curveIndex * 0.21,
+          0.035 + curveIndex * 0.003,
+          0.55,
+        );
         group.add(pulse);
         network.remove(pulse);
       });
@@ -395,9 +486,12 @@ export default function ElectricalScene() {
     network.add(arcGroup);
     const arcLines: any[] = [];
 
-    for (let arcIndex = 0; arcIndex < 4; arcIndex += 1) {
+    for (let arcIndex = 0; arcIndex < detail.arcCount; arcIndex += 1) {
       const geometry = new THREE.BufferGeometry();
-      geometry.setAttribute("position", new THREE.BufferAttribute(new Float32Array(24 * 3), 3));
+      geometry.setAttribute(
+        "position",
+        new THREE.BufferAttribute(new Float32Array(detail.arcPoints * 3), 3),
+      );
       const material = new THREE.LineBasicMaterial({
         color: arcIndex % 2 ? YELLOW_SOFT : YELLOW,
         transparent: true,
@@ -420,8 +514,8 @@ export default function ElectricalScene() {
           Math.sin(angle) * (0.6 + lineIndex * 0.08),
         );
 
-        for (let pointIndex = 0; pointIndex < 24; pointIndex += 1) {
-          const t = pointIndex / 23;
+        for (let pointIndex = 0; pointIndex < detail.arcPoints; pointIndex += 1) {
+          const t = pointIndex / (detail.arcPoints - 1);
           const pseudo = Math.sin((seedBase + pointIndex * 13 + lineIndex * 31) * 12.9898) * 43758.5453;
           const noise = (pseudo - Math.floor(pseudo) - 0.5) * 0.16 * Math.sin(Math.PI * t);
 
@@ -434,7 +528,7 @@ export default function ElectricalScene() {
       });
     };
 
-    const particleCount = 420;
+    const particleCount = detail.particleCount;
     const particlePositions = new Float32Array(particleCount * 3);
     let seed = 29;
     const random = () => {
@@ -463,9 +557,15 @@ export default function ElectricalScene() {
     root.add(particles);
 
     const depthRings = new THREE.Group();
-    [-3.4, -1.6, 0.4, 2.4].forEach((z, index) => {
+    const depthRingPositions = mobileProfile ? [-1.4, 1.0] : [-3.4, -1.6, 0.4, 2.4];
+    depthRingPositions.forEach((z, index) => {
       const ring = new THREE.Mesh(
-        new THREE.TorusGeometry(2.6 + index * 0.45, 0.012, 6, 96),
+        new THREE.TorusGeometry(
+          2.6 + index * 0.45,
+          0.012,
+          mobileProfile ? 5 : 6,
+          mobileProfile ? 48 : 96,
+        ),
         new THREE.MeshBasicMaterial({
           color: index === 2 ? YELLOW : 0x536078,
           transparent: true,
@@ -484,6 +584,7 @@ export default function ElectricalScene() {
     let pointerY = 0;
     let frame = 0;
     let lastArcTick = -1;
+    let lastRenderTime = 0;
 
     const smoothStep = (edge0: number, edge1: number, value: number) => {
       const x = THREE.MathUtils.clamp((value - edge0) / Math.max(edge1 - edge0, 0.0001), 0, 1);
@@ -508,15 +609,30 @@ export default function ElectricalScene() {
       camera.updateProjectionMatrix();
       renderer.setSize(width, height, false);
 
-      const mobile = width < 760;
-      root.position.x = mobile ? -0.7 : 0;
-      root.position.y = mobile ? -0.15 : 0;
-      root.scale.setScalar(mobile ? 0.79 : width < 1180 ? 0.92 : 1);
+      const mobile = width < 820 || coarsePointer.matches;
+      renderer.setPixelRatio(
+        Math.min(window.devicePixelRatio, mobile ? 1.15 : detail.maxPixelRatio),
+      );
+      root.position.x = mobile ? 0.08 : 0;
+      root.position.y = mobile ? -0.32 : 0;
+      root.scale.setScalar(mobile ? 0.68 : width < 1180 ? 0.92 : 1);
+      camera.position.z = mobile ? 11.6 : 8.4;
     };
 
     const renderScene = (time = 0) => {
       const still = reducedMotion.matches;
-      progress = still ? targetProgress : THREE.MathUtils.lerp(progress, targetProgress, 0.055);
+
+      if (
+        !still &&
+        mobileProfile &&
+        detail.targetFrameMs > 0 &&
+        time - lastRenderTime < detail.targetFrameMs
+      ) {
+        frame = window.requestAnimationFrame(renderScene);
+        return;
+      }
+      lastRenderTime = time;
+      progress = still ? targetProgress : THREE.MathUtils.lerp(progress, targetProgress, 0.065);
 
       const activeBranch = Math.min(2, Math.max(0, Math.floor(progress * 3.2)));
       const activeT = branchDefinitions[activeBranch].t;
@@ -565,7 +681,10 @@ export default function ElectricalScene() {
 
       arcLines.forEach((line, index) => {
         const material = line.material;
-        material.opacity = still ? 0.12 : Math.max(0, Math.sin(time * 0.012 + index * 1.8)) * 0.72;
+        const mobileArcStrength = mobileProfile ? 0.46 : 0.72;
+        material.opacity = still
+          ? 0.12
+          : Math.max(0, Math.sin(time * 0.012 + index * 1.8)) * mobileArcStrength;
       });
 
       if (!still) {
@@ -573,18 +692,20 @@ export default function ElectricalScene() {
         depthRings.rotation.z = time * 0.000025;
       }
 
-      const sceneTurn = progress * 0.72;
-      network.rotation.y = sceneTurn + (window.innerWidth < 760 ? 0 : pointerX * 0.08);
+      const mobileFrame = window.innerWidth < 820 || coarsePointer.matches;
+      const sceneTurn = progress * (mobileFrame ? 0.38 : 0.72);
+      network.rotation.y = sceneTurn + (mobileFrame ? 0 : pointerX * 0.08);
       network.rotation.z = -0.05 + Math.sin(progress * Math.PI * 2) * 0.055;
       network.position.y = Math.sin(progress * Math.PI) * 0.16;
 
-      const xDrift = window.innerWidth < 760 ? 0 : pointerX * 0.2;
-      const yDrift = window.innerWidth < 760 ? 0 : -pointerY * 0.11;
+      const xDrift = mobileFrame ? 0 : pointerX * 0.2;
+      const yDrift = mobileFrame ? 0 : -pointerY * 0.11;
       camera.position.x = THREE.MathUtils.lerp(camera.position.x, xDrift, 0.04);
       camera.position.y = THREE.MathUtils.lerp(camera.position.y, yDrift, 0.04);
       camera.position.z = THREE.MathUtils.lerp(
         camera.position.z,
-        8.4 - Math.sin(progress * Math.PI) * 0.72,
+        (mobileFrame ? 11.6 : 8.4) -
+          Math.sin(progress * Math.PI) * (mobileFrame ? 0.45 : 0.72),
         0.035,
       );
       camera.lookAt(0.75, -0.15, -0.2);
@@ -594,6 +715,19 @@ export default function ElectricalScene() {
       renderer.render(scene, camera);
 
       if (!still) frame = window.requestAnimationFrame(renderScene);
+    };
+
+    const handleVisibility = () => {
+      if (document.hidden) {
+        if (frame) window.cancelAnimationFrame(frame);
+        frame = 0;
+        return;
+      }
+
+      if (!reducedMotion.matches && !frame) {
+        lastRenderTime = 0;
+        frame = window.requestAnimationFrame(renderScene);
+      }
     };
 
     const handleMotionPreference = () => {
@@ -610,7 +744,10 @@ export default function ElectricalScene() {
     resize();
     window.addEventListener("scroll", updateScroll, { passive: true });
     window.addEventListener("resize", resize);
-    window.addEventListener("pointermove", updatePointer, { passive: true });
+    if (!mobileProfile) {
+      window.addEventListener("pointermove", updatePointer, { passive: true });
+    }
+    document.addEventListener("visibilitychange", handleVisibility);
     reducedMotion.addEventListener("change", handleMotionPreference);
 
     if (reducedMotion.matches) renderScene();
@@ -620,7 +757,10 @@ export default function ElectricalScene() {
       if (frame) window.cancelAnimationFrame(frame);
       window.removeEventListener("scroll", updateScroll);
       window.removeEventListener("resize", resize);
-      window.removeEventListener("pointermove", updatePointer);
+      if (!mobileProfile) {
+        window.removeEventListener("pointermove", updatePointer);
+      }
+      document.removeEventListener("visibilitychange", handleVisibility);
       reducedMotion.removeEventListener("change", handleMotionPreference);
       document.documentElement.style.removeProperty("--scroll-progress");
 
