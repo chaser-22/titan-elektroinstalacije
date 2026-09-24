@@ -593,7 +593,7 @@ export default function ElectricalScene() {
 
     const mobileHalo = new THREE.Group();
     if (mobileProfile) {
-      const haloTexture = createGlowTexture();
+      const haloTexture = glowTexture;
       if (haloTexture) {
         const halo = new THREE.Sprite(
           new THREE.SpriteMaterial({
