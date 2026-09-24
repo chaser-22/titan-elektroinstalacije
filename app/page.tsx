@@ -114,6 +114,12 @@ export default function Home() {
             </div>
           </div>
 
+          <div className="hero__mobile-hud" aria-hidden="true">
+            <span>LIVE 3D</span>
+            <strong>220<small>V</small></strong>
+            <i>SCROLL / ROUTE</i>
+          </div>
+
           <aside className="hero__hud" aria-label="Vizuelni prikaz Titan sistema">
             <div className="hud-card hud-card--top">
               <span className="hud-label">LIVE SYSTEM</span>
