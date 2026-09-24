@@ -114,17 +114,11 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="hero__mobile-hud" aria-hidden="true">
-            <span>LIVE 3D</span>
-            <strong>220<small>V</small></strong>
-            <i>SCROLL / ROUTE</i>
-          </div>
-
           <aside className="hero__hud" aria-label="Vizuelni prikaz Titan sistema">
             <div className="hud-card hud-card--top">
-              <span className="hud-label">LIVE SYSTEM</span>
+              <span className="hud-label">SISTEM AKTIVAN</span>
               <strong>220<span>V</span></strong>
-              <small>SCROLL TO ROUTE POWER</small>
+              <small>SKROLUJ / USMJERI ENERGIJU</small>
             </div>
             <div className="hud-card hud-card--bottom">
               <span>JAKA STRUJA</span><i />
@@ -133,7 +127,7 @@ export default function Home() {
             </div>
           </aside>
 
-          <div className="hero__scroll-cue" aria-hidden="true"><span>SCROLL</span><i /></div>
+          <div className="hero__scroll-cue" aria-hidden="true"><span>SKROLUJ</span><i /></div>
         </section>
 
         <section className="services section section--glass" id="usluge">
