@@ -2,7 +2,6 @@ import ElectricalScene from "./electrical-scene";
 
 const serviceGroups = [
   {
-    number: "01",
     title: "Jaka struja",
     description: "Kompletna infrastruktura koja mora raditi sigurno, uredno i bez improvizacije.",
     items: [
@@ -13,7 +12,6 @@ const serviceGroups = [
     ],
   },
   {
-    number: "02",
     title: "Slaba struja",
     description: "Sistemi koji povezuju objekat, bezbjednost i svakodnevnu automatizaciju.",
     items: [
@@ -24,7 +22,6 @@ const serviceGroups = [
     ],
   },
   {
-    number: "03",
     title: "Adaptacije",
     description: "Precizna zamjena, dogradnja i rekonstrukcija instalacija u postojećem prostoru.",
     items: [
@@ -37,10 +34,10 @@ const serviceGroups = [
 ];
 
 const process = [
-  ["01", "Kontakt", "Pozivom ili porukom opišite šta vam je potrebno."],
-  ["02", "Procjena", "Dogovaramo obilazak i definišemo obim radova."],
-  ["03", "Ponuda", "Dobijate jasan prijedlog radova i termina."],
-  ["04", "Izvođenje", "Radove završavamo prema dogovorenom planu."],
+  ["Kontakt", "Pozivom ili porukom opišite šta vam je potrebno."],
+  ["Procjena", "Dogovaramo obilazak i definišemo obim radova."],
+  ["Ponuda", "Dobijate jasan prijedlog radova i termina."],
+  ["Izvođenje", "Radove završavamo prema dogovorenom planu."],
 ];
 
 function ArrowIcon({ className = "" }: { className?: string }) {
@@ -64,12 +61,6 @@ export default function Home() {
     <>
       <a className="skip-link" href="#glavni-sadrzaj">Preskoči na glavni sadržaj</a>
       <ElectricalScene />
-
-      <div className="scroll-meter" aria-hidden="true">
-        <span>01</span>
-        <div><i /></div>
-        <span>05</span>
-      </div>
 
       <div className="announcement">
         <div className="announcement__track" aria-hidden="true">
@@ -131,7 +122,7 @@ export default function Home() {
         </section>
 
         <section className="services section section--glass" id="usluge">
-          <div className="section-kicker"><span>01</span><p>USLUGE / DISTRIBUCIJA</p></div>
+          <div className="section-kicker"><p>USLUGE / DISTRIBUCIJA</p></div>
           <div className="section-heading">
             <h2>Jedan tim.<br /><em>Cijeli sistem.</em></h2>
             <p>Od grubih instalacija do pametnih sistema i završne montaže — sve vodimo kao jednu povezanu cjelinu.</p>
@@ -140,7 +131,7 @@ export default function Home() {
           <div className="service-grid">
             {serviceGroups.map((group) => (
               <article className="service-card" key={group.title}>
-                <div className="service-card__head"><span>{group.number}</span><ArrowIcon /></div>
+                <div className="service-card__head"><ArrowIcon /></div>
                 <div>
                   <h3>{group.title}</h3>
                   <p>{group.description}</p>
@@ -153,7 +144,7 @@ export default function Home() {
 
         <section className="system section" id="sistem">
           <div className="system__copy">
-            <div className="section-kicker"><span>02</span><p>TITAN / PRINCIP</p></div>
+            <div className="section-kicker"><p>TITAN / PRINCIP</p></div>
             <h2>Instalacija nije<br />samo kabl.<br /><em>To je sistem.</em></h2>
             <p>
               Dobar posao mora biti logičan od početka: uredna trasa, pravilna zaštita, jasna raspodjela i završna obrada koja izgleda kao da je tu oduvijek trebalo da bude.
@@ -162,14 +153,14 @@ export default function Home() {
           </div>
 
           <div className="system__matrix" aria-label="Tri principa rada">
-            <article><span>01 / PLAN</span><strong>Jasna trasa</strong><p>Prvo definišemo šta ide gdje i zašto.</p></article>
-            <article><span>02 / ZAŠTITA</span><strong>Siguran razvod</strong><p>Svaka linija dobija svoje mjesto i odgovarajuću zaštitu.</p></article>
-            <article><span>03 / FINIŠ</span><strong>Čista izvedba</strong><p>Završni detalji moraju biti precizni koliko i instalacija iza zida.</p></article>
+            <article><span>PLAN</span><strong>Jasna trasa</strong><p>Prvo definišemo šta ide gdje i zašto.</p></article>
+            <article><span>ZAŠTITA</span><strong>Siguran razvod</strong><p>Svaka linija dobija svoje mjesto i odgovarajuću zaštitu.</p></article>
+            <article><span>FINIŠ</span><strong>Čista izvedba</strong><p>Završni detalji moraju biti precizni koliko i instalacija iza zida.</p></article>
           </div>
         </section>
 
         <section className="work section section--glass" id="radovi">
-          <div className="section-kicker"><span>03</span><p>RADOVI / SIGNAL</p></div>
+          <div className="section-kicker"><p>RADOVI / SIGNAL</p></div>
           <div className="section-heading">
             <h2>Rezultat se vidi.<br /><em>Standard ostaje.</em></h2>
             <a className="text-link" href="https://www.instagram.com/elektroinstalacije_titan/" target="_blank" rel="noreferrer">
@@ -178,23 +169,22 @@ export default function Home() {
           </div>
 
           <div className="work-strip">
-            <article className="work-panel work-panel--wide"><span>01</span><strong>RAZVOD</strong><p>Precizno organizovana tabla i jasna logika instalacije.</p></article>
-            <article className="work-panel"><span>02</span><strong>RASVJETA</strong><p>Funkcija, atmosfera i čista završna montaža.</p></article>
-            <article className="work-panel"><span>03</span><strong>SMART</strong><p>Kontrola sistema bez nepotrebne komplikacije.</p></article>
-            <article className="work-panel work-panel--wide"><span>04</span><strong>ADAPTACIJA</strong><p>Nova instalacija unutar postojećeg prostora, bez haosa.</p></article>
+            <article className="work-panel work-panel--wide"><strong>RAZVOD</strong><p>Precizno organizovana tabla i jasna logika instalacije.</p></article>
+            <article className="work-panel"><strong>RASVJETA</strong><p>Funkcija, atmosfera i čista završna montaža.</p></article>
+            <article className="work-panel"><strong>SMART</strong><p>Kontrola sistema bez nepotrebne komplikacije.</p></article>
+            <article className="work-panel work-panel--wide"><strong>ADAPTACIJA</strong><p>Nova instalacija unutar postojećeg prostora, bez haosa.</p></article>
           </div>
         </section>
 
         <section className="process section" id="proces">
           <div className="process__heading">
-            <div className="section-kicker"><span>04</span><p>PROCES / TOK</p></div>
+            <div className="section-kicker"><p>PROCES / TOK</p></div>
             <h2>Od poziva do<br /><em>uključenja.</em></h2>
             <p>Bez komplikovanog procesa. Jasno definišemo posao, termin i sljedeći korak.</p>
           </div>
           <div className="process__steps">
-            {process.map(([number, title, text]) => (
-              <article key={number}>
-                <span>{number}</span>
+            {process.map(([title, text]) => (
+              <article key={title}>
                 <h3>{title}</h3>
                 <p>{text}</p>
                 <i aria-hidden="true" />
@@ -206,7 +196,7 @@ export default function Home() {
         <section className="contact" id="kontakt">
           <div className="contact__noise" aria-hidden="true" />
           <div className="contact__content">
-            <div className="section-kicker section-kicker--dark"><span>05</span><p>KONTAKT / START</p></div>
+            <div className="section-kicker section-kicker--dark"><p>KONTAKT / START</p></div>
             <h2>Imate projekat?<br /><em>Uključimo ga.</em></h2>
             <p>Opišite nam šta vam je potrebno. Javićemo se radi dogovora i procjene radova.</p>
             <a className="contact__phone" href="tel:+38267152154">
