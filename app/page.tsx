@@ -104,7 +104,7 @@ export default function Home() {
             <p className="eyebrow"><span /> ELEKTROINSTALACIJE • CRNA GORA</p>
             <h1>Snaga koja<br />ostaje <em>pod kontrolom.</em></h1>
             <p className="hero__lead">
-              Kompletne električarske usluge za domove, poslovne prostore i objekte — od prve instalacije do posljednjeg prekidača.
+              Kompletne elektroinstalacije za domove i poslovne objekte — od razvoda i rasvjete do automatike.
             </p>
             <div className="hero__actions">
               <a className="button" href="tel:+38267152154">Pozovite Titan <ArrowIcon /></a>
@@ -121,21 +121,16 @@ export default function Home() {
               <strong>220<span>V</span></strong>
               <small>SKROLUJ / POVEŽI SISTEM</small>
             </div>
-            <div className="hud-card hud-card--bottom">
-              <span>JAKA STRUJA</span><i />
-              <span>SLABA STRUJA</span><i />
-              <span>ADAPTACIJE</span>
-            </div>
-          </aside>
+            </aside>
 
           <div className="hero__scroll-cue" aria-hidden="true"><span>SKROLUJ</span><i /></div>
         </section>
 
         <section className="services section section--glass" id="usluge">
-          <div className="section-kicker"><p>USLUGE / DISTRIBUCIJA</p></div>
+          <div className="section-kicker"><p>USLUGE</p></div>
           <div className="section-heading">
             <h2>Jedan tim.<br /><em>Cijeli sistem.</em></h2>
-            <p>Od grubih instalacija do pametnih sistema i završne montaže — sve vodimo kao jednu povezanu cjelinu.</p>
+            <p>Od grubih instalacija do završne montaže, jedan tim vodi cijeli sistem.</p>
           </div>
 
           <div className="service-grid">
@@ -154,10 +149,10 @@ export default function Home() {
 
         <section className="system section" id="sistem">
           <div className="system__copy">
-            <div className="section-kicker"><p>TITAN / PRINCIP</p></div>
+            <div className="section-kicker"><p>PRINCIP</p></div>
             <h2>Instalacija nije<br />samo kabl.<br /><em>To je sistem.</em></h2>
             <p>
-              Dobar posao mora biti logičan od početka: uredna trasa, pravilna zaštita, jasna raspodjela i završna obrada koja izgleda kao da je tu oduvijek trebalo da bude.
+              Uredna trasa, pravilna zaštita i jasna raspodjela — sistem mora imati logiku od početka do završne obrade.
             </p>
             <a className="text-link" href="#proces">Kako radimo <ArrowIcon /></a>
           </div>
@@ -170,7 +165,7 @@ export default function Home() {
         </section>
 
         <section className="work work--transparent section" id="radovi">
-          <div className="section-kicker"><p>RADOVI / SIGNAL</p></div>
+          <div className="section-kicker"><p>RADOVI</p></div>
           <div className="section-heading work__heading">
             <h2>Rezultat se vidi.<br /><em>Standard ostaje.</em></h2>
             <a
@@ -212,9 +207,9 @@ export default function Home() {
 
         <section className="process section" id="proces">
           <div className="process__heading">
-            <div className="section-kicker"><p>PROCES / TOK</p></div>
+            <div className="section-kicker"><p>PROCES</p></div>
             <h2>Od poziva do<br /><em>uključenja.</em></h2>
-            <p>Bez komplikovanog procesa. Jasno definišemo posao, termin i sljedeći korak.</p>
+            <p>Jasno definišemo posao, termin i svaki sljedeći korak.</p>
           </div>
           <div className="process__steps">
             {process.map(([title, text]) => (
@@ -230,9 +225,9 @@ export default function Home() {
         <section className="contact" id="kontakt">
           <div className="contact__noise" aria-hidden="true" />
           <div className="contact__content">
-            <div className="section-kicker section-kicker--dark"><p>KONTAKT / START</p></div>
+            <div className="section-kicker section-kicker--dark"><p>KONTAKT</p></div>
             <h2>Imate projekat?<br /><em>Uključimo ga.</em></h2>
-            <p>Opišite nam šta vam je potrebno. Javićemo se radi dogovora i procjene radova.</p>
+            <p>Opišite projekat. Javljamo se radi dogovora i procjene radova.</p>
             <a className="contact__phone" href="tel:+38267152154">
               <small>POZOVITE NAS</small><strong>067 152 154</strong><ArrowIcon />
             </a>
@@ -240,7 +235,7 @@ export default function Home() {
           <div className="contact__details">
             <div><span>INSTAGRAM</span><a href="https://www.instagram.com/elektroinstalacije_titan/" target="_blank" rel="noreferrer">@elektroinstalacije_titan</a></div>
             <div><span>SERVISNA ZONA</span><strong>CRNA GORA</strong></div>
-            <div><span>DISCIPLINE</span><strong>JAKA • SLABA • ADAPTACIJE</strong></div>
+            <div><span>USLUGE</span><strong>JAKA • SLABA • AUTOMATIKA</strong></div>
           </div>
           <div className="contact__giant" aria-hidden="true"><BoltMark /></div>
         </section>
