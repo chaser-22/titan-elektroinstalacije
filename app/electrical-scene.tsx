@@ -328,6 +328,11 @@ export default function ElectricalScene() {
         transparent: true,
         opacity: 0.16,
       });
+      const ductSlotMaterial = new THREE.MeshBasicMaterial({
+        color: 0x050912,
+        transparent: true,
+        opacity: 0.72,
+      });
       const ductYs = [1.48, -0.38, -2.2];
 
       ductYs.forEach((y) => {
@@ -345,17 +350,7 @@ export default function ElectricalScene() {
         for (let index = 0; index < slotCount; index += 1) {
           const slotX = -1.58 + index * (4.56 / Math.max(1, slotCount - 1));
           panelRig.add(
-            box(
-              0.055,
-              0.12,
-              0.025,
-              new THREE.MeshBasicMaterial({
-                color: 0x050912,
-                transparent: true,
-                opacity: 0.72,
-              }),
-              [slotX, y, 0.495],
-            ),
+            box(0.055, 0.12, 0.025, ductSlotMaterial, [slotX, y, 0.495]),
           );
         }
       });
