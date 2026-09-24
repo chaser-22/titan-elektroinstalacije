@@ -122,7 +122,7 @@ section[id] { scroll-margin-top: 100px; }
 .bolt-mark { width: 25px; height: 25px; fill: currentColor; }
 .brand__text { display: flex; flex-direction: column; gap: 2px; }
 .brand__text strong { font-size: 20px; line-height: 1; letter-spacing: .25em; }
-.brand__text small { color: var(--muted); font-size: 6px; font-weight: 800; letter-spacing: .25em; }
+.brand__text small { color: #aab2c0; font-size: 7px; font-weight: 800; letter-spacing: .22em; }
 .site-header nav { display: flex; align-items: center; gap: 30px; }
 .site-header nav a {
   display: inline-flex;
@@ -228,10 +228,8 @@ h1 em, h2 em { color: var(--yellow); font-style: normal; }
 .hud-card--top .hud-label { color: var(--yellow); font-size: 9px; font-weight: 900; letter-spacing: .14em; }
 .hud-card--top strong { display: block; margin-top: 14px; font-size: 47px; letter-spacing: -.07em; }
 .hud-card--top strong span { margin-left: 4px; color: var(--yellow); font-size: 14px; letter-spacing: 0; }
-.hud-card--top small { color: #aeb7c7; font-size: 7px; font-weight: 800; letter-spacing: .14em; }
-.hud-card--bottom { right: 7%; bottom: 8%; display: grid; grid-template-columns: auto 1fr; gap: 9px 12px; width: 210px; color: #b5bdca; font-size: 7px; font-weight: 800; letter-spacing: .14em; }
-.hud-card--bottom i { align-self: center; height: 1px; background: linear-gradient(90deg, var(--yellow), transparent); }
-.hero__scroll-cue { position: absolute; z-index: 4; right: clamp(24px, 7vw, 108px); bottom: 24px; display: flex; align-items: center; gap: 11px; color: #6f788b; font-size: 7px; font-weight: 900; letter-spacing: .16em; writing-mode: vertical-rl; }
+.hud-card--top small { color: #b9c1ce; font-size: 8px; font-weight: 800; letter-spacing: .12em; }
+.hero__scroll-cue { position: absolute; z-index: 4; right: clamp(24px, 7vw, 108px); bottom: 24px; display: flex; align-items: center; gap: 11px; color: #9aa4b5; font-size: 8px; font-weight: 900; letter-spacing: .14em; writing-mode: vertical-rl; }
 .hero__scroll-cue i { width: 1px; height: 42px; background: linear-gradient(var(--yellow), transparent); }
 
 .section { position: relative; padding: 118px clamp(24px, 7vw, 108px); }
@@ -500,19 +498,19 @@ h1 em, h2 em { color: var(--yellow); font-style: normal; }
 .contact h2 em { color: var(--ink); text-decoration: underline; text-decoration-color: var(--white); text-decoration-thickness: .07em; text-underline-offset: .08em; }
 .contact__content > p { max-width: 570px; margin: 30px 0; font-size: 15px; line-height: 1.7; }
 .contact__phone { display: grid; max-width: 700px; grid-template-columns: 1fr auto; align-items: center; margin-top: 42px; padding: 23px 0; border-top: 2px solid var(--ink); border-bottom: 2px solid var(--ink); }
-.contact__phone small { grid-column: 1; margin-bottom: 5px; font-size: 8px; font-weight: 900; letter-spacing: .17em; }
+.contact__phone small { grid-column: 1; margin-bottom: 5px; font-size: 9px; font-weight: 900; letter-spacing: .15em; }
 .contact__phone strong { grid-column: 1; font-size: clamp(44px, 5vw, 78px); line-height: 1; letter-spacing: -.055em; }
 .contact__phone .arrow-icon { width: 36px; height: 36px; grid-column: 2; grid-row: 1 / span 2; }
 .contact__details { border-top: 1px solid rgba(8,13,26,.35); }
 .contact__details div { display: flex; flex-direction: column; gap: 8px; padding: 24px 0; border-bottom: 1px solid rgba(8,13,26,.35); }
-.contact__details span { font-size: 7px; font-weight: 900; letter-spacing: .17em; }
+.contact__details span { font-size: 9px; font-weight: 900; letter-spacing: .15em; }
 .contact__details a, .contact__details strong { display: flex; min-height: 34px; align-items: center; font-size: 12px; font-weight: 900; text-transform: uppercase; }
 .contact__details a:hover { text-decoration: underline; }
 .contact__giant { position: absolute; z-index: 1; right: -8vw; bottom: -14vw; color: rgba(8,13,26,.08); transform: rotate(-7deg); }
 .contact__giant .bolt-mark { width: 50vw; height: 50vw; }
 
 footer { display: grid; min-height: 126px; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 20px clamp(24px, 4.8vw, 76px); background: #050910; border-top: 1px solid var(--line); }
-footer p, footer > a:last-child { color: #7d8799; font-size: 8px; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; }
+footer p, footer > a:last-child { color: #9aa4b5; font-size: 9px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
 footer > a:last-child { display: flex; min-height: 44px; align-items: center; justify-self: end; }
 
 .not-found { display: grid; min-height: 100svh; place-items: center; padding: 40px 20px; text-align: center; background: var(--ink); }
@@ -571,7 +569,7 @@ footer > a:last-child { display: flex; min-height: 44px; align-items: center; ju
   .system__matrix article { backdrop-filter: none; }
   .brand__mark { width: 42px; height: 42px; }
   .brand__text strong { font-size: 16px; }
-  .brand__text small { font-size: 5px; }
+  .brand__text small { font-size: 6px; }
   .site-header .button { min-height: 44px; padding: 0 12px; }
   .site-header .button .arrow-icon { display: none; }
   .hero {
@@ -595,7 +593,7 @@ footer > a:last-child { display: flex; min-height: 44px; align-items: center; ju
     background: radial-gradient(ellipse at 18% 42%, rgba(8,13,26,.76), rgba(8,13,26,.3) 48%, transparent 76%);
     pointer-events: none;
   }
-  .eyebrow { gap: 9px; margin-bottom: 22px; font-size: 8px; line-height: 1.45; letter-spacing: .16em; }
+  .eyebrow { gap: 9px; margin-bottom: 22px; font-size: 9px; line-height: 1.45; letter-spacing: .14em; }
   .eyebrow > span { width: 24px; flex: 0 0 24px; }
   h1 { max-width: 100%; font-size: clamp(48px, 13vw, 64px); line-height: .9; }
   .hero__lead {
@@ -651,7 +649,7 @@ footer > a:last-child { display: flex; min-height: 44px; align-items: center; ju
 
 @media (max-width: 430px) {
   .brand__text { display: none; }
-  .site-header .button { font-size: 8px; }
+  .site-header .button { font-size: 9px; }
   .hero__disciplines { display: grid; grid-template-columns: 1fr 1fr; }
 }
 
@@ -816,7 +814,7 @@ footer > a:last-child { display: flex; min-height: 44px; align-items: center; ju
 @media (max-width: 820px) {
   .announcement { display: none; }
   .hero__scroll-cue { opacity: .72; }
-  .work-panel__meta { font-size: 8px; }
+  .work-panel__meta { font-size: 9px; }
   .process__steps h3 { font-size: 20px; }
   .process__steps p { font-size: 13px; }
 }
