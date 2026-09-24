@@ -607,11 +607,12 @@ export default function ElectricalScene() {
 
       // Contactors / relays.
       const relayGroups: any[] = [];
-      const relayCount = mobile ? 3 : 4;
+      const relayCount = 3;
+      const relayXs = mobile ? [-0.62, 0.36, 1.34] : [-0.72, 0.34, 1.4];
       for (let index = 0; index < relayCount; index += 1) {
         const relay = createModule({
           name: index === 0 ? "K1" : index === 1 ? "K2" : "REL",
-          position: [-0.62 + index * 0.92, 0.55, 0.54],
+          position: [relayXs[index], 0.55, 0.52],
           size: [0.72, 1.0, 0.64],
           accent: index % 2 ? BLUE : YELLOW,
           start: 0.49 + index * 0.045,
@@ -706,10 +707,11 @@ export default function ElectricalScene() {
       });
 
       // Network port block.
+      const networkPortX = mobile ? 2.62 : 2.92;
       const networkPort = createModule({
         name: "MREŽA",
-        position: [2.52, 0.55, 0.52],
-        size: [0.78, 0.78, 0.6],
+        position: [networkPortX, 0.55, 0.46],
+        size: [0.7, 0.74, 0.54],
         accent: CYAN,
         start: 0.6,
         ledCount: 2,
@@ -915,7 +917,7 @@ export default function ElectricalScene() {
       // PLC / I/O down to contactors.
       for (let index = 0; index < relayCount; index += 1) {
         const sourceX = Math.min(2.8, 1.42 + index * 0.44);
-        const targetX = -0.62 + index * 0.92;
+        const targetX = relayXs[index];
         createCable({
           points: [
             [sourceX, 1.88, 0.86],
@@ -936,8 +938,8 @@ export default function ElectricalScene() {
       for (let index = 0; index < outputCableCount; index += 1) {
         const sourceX =
           index === outputCableCount - 1
-            ? 2.52
-            : -0.7 + (index % relayCount) * 0.92;
+            ? networkPortX
+            : relayXs[index % relayCount];
         const terminalIndex = Math.round(
           (index / Math.max(1, outputCableCount - 1)) * (detail.terminalCount - 1),
         );
@@ -1269,10 +1271,11 @@ export default function ElectricalScene() {
             module.basePosition.x + breathe * (mobile ? 0.004 : 0.007);
           module.group.position.y =
             module.basePosition.y + breathe * (mobile ? 0.005 : 0.009);
+          const isNetworkModule = module.group === networkPort;
           module.group.position.z =
             module.basePosition.z +
-            live * (mobile ? 0.025 : 0.04) +
-            breathe * (mobile ? 0.012 : 0.018);
+            live * (isNetworkModule ? 0.012 : mobile ? 0.025 : 0.04) +
+            breathe * (isNetworkModule ? 0.006 : mobile ? 0.012 : 0.018);
           module.group.rotation.y =
             breathe * (mobile ? 0.006 : 0.012);
 
@@ -1393,7 +1396,7 @@ export default function ElectricalScene() {
           reducedMotion.matches ? 0 : Math.sin(time * 0.0017) * psuLive * 0.006;
         const networkLive = easeProgress(0.58, 0.72, progress);
         networkPort.rotation.y =
-          reducedMotion.matches ? 0 : Math.sin(time * 0.0015) * networkLive * 0.012;
+          reducedMotion.matches ? 0 : Math.sin(time * 0.0015) * networkLive * 0.006;
 
         // Ambient field keeps moving without modifying the cabinet's scroll transform.
         if (!reducedMotion.matches) {
