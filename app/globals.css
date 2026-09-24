@@ -256,6 +256,7 @@ h1 em, h2 em { color: var(--yellow); font-style: normal; }
 .hud-card--top small { color: #7e899d; font-size: 6px; font-weight: 800; letter-spacing: .17em; }
 .hud-card--bottom { right: 7%; bottom: 8%; display: grid; grid-template-columns: auto 1fr; gap: 9px 12px; width: 210px; color: #b5bdca; font-size: 7px; font-weight: 800; letter-spacing: .14em; }
 .hud-card--bottom i { align-self: center; height: 1px; background: linear-gradient(90deg, var(--yellow), transparent); }
+.hero__mobile-hud { display: none; }
 .hero__scroll-cue { position: absolute; z-index: 4; right: clamp(24px, 7vw, 108px); bottom: 24px; display: flex; align-items: center; gap: 11px; color: #6f788b; font-size: 7px; font-weight: 900; letter-spacing: .16em; writing-mode: vertical-rl; }
 .hero__scroll-cue i { width: 1px; height: 42px; background: linear-gradient(var(--yellow), transparent); }
 
@@ -465,6 +466,64 @@ footer > a:last-child { display: flex; min-height: 44px; align-items: center; ju
   .hero__disciplines { max-width: 330px; margin-top: 36px; }
   .hero__disciplines span { min-height: 38px; display: flex; align-items: center; }
   .hero__hud { display: none; }
+  .hero__mobile-hud {
+    position: absolute;
+    z-index: 5;
+    top: 47%;
+    right: 14px;
+    display: grid;
+    width: 96px;
+    gap: 5px;
+    padding: 10px 10px 9px;
+    color: #fffefa;
+    background: rgba(8,13,26,.42);
+    border: 1px solid rgba(244,183,0,.38);
+    backdrop-filter: blur(7px);
+    pointer-events: none;
+  }
+  .hero__mobile-hud::before,
+  .hero__mobile-hud::after {
+    position: absolute;
+    content: "";
+    width: 9px;
+    height: 9px;
+    border-color: var(--yellow);
+  }
+  .hero__mobile-hud::before {
+    top: -1px;
+    left: -1px;
+    border-top: 1px solid;
+    border-left: 1px solid;
+  }
+  .hero__mobile-hud::after {
+    right: -1px;
+    bottom: -1px;
+    border-right: 1px solid;
+    border-bottom: 1px solid;
+  }
+  .hero__mobile-hud > span {
+    color: var(--yellow);
+    font-size: 7px;
+    font-weight: 900;
+    letter-spacing: .16em;
+  }
+  .hero__mobile-hud strong {
+    font-size: 26px;
+    line-height: .9;
+    letter-spacing: -.07em;
+  }
+  .hero__mobile-hud strong small {
+    margin-left: 3px;
+    color: var(--yellow);
+    font-size: 9px;
+  }
+  .hero__mobile-hud > i {
+    color: #aeb6c5;
+    font-size: 5px;
+    font-style: normal;
+    font-weight: 900;
+    letter-spacing: .14em;
+  }
   .hero__scroll-cue { right: 12px; }
   .section { padding: 84px 20px; }
   .section-kicker { margin-bottom: 36px; }
