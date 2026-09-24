@@ -23,6 +23,8 @@ type CableRoute = {
   pulse: any;
   pulseOffset: number;
   color: number;
+  pulsePoint: any;
+  tangent: any;
 };
 
 type StatusModule = {
@@ -657,6 +659,7 @@ export default function ElectricalScene() {
 
       // Cable construction.
       const cableRoutes: CableRoute[] = [];
+      const unitY = new THREE.Vector3(0, 1, 0);
 
       const createCable = ({
         points,
@@ -748,6 +751,8 @@ export default function ElectricalScene() {
           pulse,
           pulseOffset,
           color,
+          pulsePoint: new THREE.Vector3(),
+          tangent: new THREE.Vector3(),
         });
 
         return cableRoutes[cableRoutes.length - 1];
@@ -983,110 +988,42 @@ export default function ElectricalScene() {
         return x * x * (3 - 2 * x);
       };
 
-      // GSAP intro.
-      panelRig.rotation.set(-0.08, mobile ? -0.16 : -0.28, -0.02);
-      panelRig.position.set(mobile ? 0.7 : 1.15, mobile ? -0.28 : -0.08, -0.05);
-      panelRig.scale.setScalar(mobile ? 0.78 : 0.92);
-
-      gsap.fromTo(
-        panelRig.rotation,
-        { x: -0.22, y: mobile ? -0.42 : -0.58 },
-        {
-          x: -0.08,
-          y: mobile ? -0.16 : -0.28,
-          duration: 1.7,
-          ease: "power3.out",
-        },
-      );
-      gsap.fromTo(
-        panelRig.position,
-        { y: mobile ? -0.65 : -0.5, z: -0.8 },
-        {
-          y: mobile ? -0.28 : -0.08,
-          z: -0.05,
-          duration: 1.8,
-          ease: "power3.out",
-        },
-      );
+      // Intro and scroll state are separated from Three.js transforms.
+      // GSAP only updates simple scalar state; the render loop owns the 3D objects.
+      const introState = { value: reducedMotion.matches ? 1 : 0 };
+      const introTween = gsap.to(introState, {
+        value: 1,
+        duration: reducedMotion.matches ? 0 : 1.45,
+        ease: "power3.out",
+      });
 
       statusModules.forEach((module, index) => {
         gsap.fromTo(
           module.group.scale,
-          { x: 0.86, y: 0.86, z: 0.86 },
+          { x: 0.9, y: 0.9, z: 0.9 },
           {
             x: 1,
             y: 1,
             z: 1,
-            delay: 0.18 + index * 0.035,
-            duration: 0.72,
-            ease: "back.out(1.4)",
+            delay: reducedMotion.matches ? 0 : 0.12 + index * 0.025,
+            duration: reducedMotion.matches ? 0 : 0.62,
+            ease: "back.out(1.25)",
           },
         );
       });
 
-      const scrollTimeline = gsap.timeline({
-        scrollTrigger: {
-          trigger: "#glavni-sadrzaj",
-          start: "top top",
-          end: "bottom bottom",
-          scrub: reducedMotion.matches ? false : mobile ? 1.15 : 1.35,
-          invalidateOnRefresh: true,
-          onUpdate: (self: any) => {
-            scrollState.target = self.progress;
-            if (reducedMotion.matches) {
-              scrollState.progress = self.progress;
-            }
-          },
+      const scrollTrigger = ScrollTrigger.create({
+        trigger: "#glavni-sadrzaj",
+        start: "top top",
+        end: "bottom bottom",
+        invalidateOnRefresh: true,
+        onUpdate: (self: any) => {
+          scrollState.target = self.progress;
+          if (reducedMotion.matches) {
+            scrollState.progress = self.progress;
+          }
         },
       });
-
-      scrollTimeline
-        .to(
-          panelRig.rotation,
-          {
-            y: mobile ? 0.02 : 0.12,
-            x: mobile ? -0.03 : -0.02,
-            ease: "none",
-          },
-          0,
-        )
-        .to(
-          panelRig.position,
-          {
-            x: mobile ? 0.18 : 0.55,
-            y: mobile ? 0.12 : 0.08,
-            ease: "none",
-          },
-          0,
-        )
-        .to(
-          panelRig.scale,
-          {
-            x: mobile ? 0.86 : 1.02,
-            y: mobile ? 0.86 : 1.02,
-            z: mobile ? 0.86 : 1.02,
-            ease: "none",
-          },
-          0.08,
-        )
-        .to(
-          panelRig.rotation,
-          {
-            y: mobile ? -0.1 : -0.18,
-            z: mobile ? 0.035 : 0.055,
-            ease: "none",
-          },
-          0.62,
-        )
-        .to(
-          panelRig.position,
-          {
-            x: mobile ? 0.4 : 0.8,
-            y: mobile ? -0.15 : -0.05,
-            ease: "none",
-          },
-          0.68,
-        );
 
       const idleTweens = [
         gsap.to(orbitGroup.rotation, {
@@ -1098,13 +1035,6 @@ export default function ElectricalScene() {
         gsap.to(ambientRig.rotation, {
           z: 0.045,
           duration: 5.6,
-          repeat: -1,
-          yoyo: true,
-          ease: "sine.inOut",
-        }),
-        gsap.to(panelGlow.material, {
-          opacity: 0.16,
-          duration: 2.4,
           repeat: -1,
           yoyo: true,
           ease: "sine.inOut",
@@ -1156,6 +1086,57 @@ export default function ElectricalScene() {
         }
 
         const progress = scrollState.progress;
+        const intro = introState.value;
+
+        // One deterministic cabinet transform for the whole scroll range.
+        const firstHalf = easeProgress(0, 0.52, progress);
+        const secondHalf = easeProgress(0.52, 1, progress);
+        const startX = mobile ? 0.72 : 1.15;
+        const middleX = mobile ? 0.14 : 0.46;
+        const endX = mobile ? 0.38 : 0.76;
+        const baseX = THREE.MathUtils.lerp(
+          THREE.MathUtils.lerp(startX, middleX, firstHalf),
+          endX,
+          secondHalf,
+        );
+        const baseY =
+          (mobile ? -0.28 : -0.08) +
+          Math.sin(progress * Math.PI) * (mobile ? 0.24 : 0.16) -
+          secondHalf * (mobile ? 0.09 : 0.05);
+        const baseRotY = THREE.MathUtils.lerp(
+          THREE.MathUtils.lerp(
+            mobile ? -0.16 : -0.28,
+            mobile ? 0.035 : 0.09,
+            firstHalf,
+          ),
+          mobile ? -0.1 : -0.16,
+          secondHalf,
+        );
+        const baseRotX = THREE.MathUtils.lerp(
+          mobile ? -0.08 : -0.08,
+          mobile ? -0.025 : -0.02,
+          firstHalf,
+        );
+        const idleCabinet =
+          reducedMotion.matches ? 0 : Math.sin(time * 0.00032) * (mobile ? 0.012 : 0.018);
+        const baseScale = THREE.MathUtils.lerp(
+          mobile ? 0.78 : 0.92,
+          mobile ? 0.87 : 1.02,
+          easeProgress(0.05, 0.58, progress),
+        );
+
+        panelRig.position.set(
+          baseX,
+          baseY - (1 - intro) * (mobile ? 0.42 : 0.5),
+          -(1 - intro) * 0.82,
+        );
+        panelRig.rotation.set(
+          baseRotX + idleCabinet,
+          baseRotY +
+            (reducedMotion.matches ? 0 : Math.sin(time * 0.00021) * (mobile ? 0.018 : 0.028)),
+          Math.sin(progress * Math.PI * 2) * (mobile ? 0.026 : 0.04),
+        );
+        panelRig.scale.setScalar(baseScale * (0.92 + intro * 0.08));
 
         // Draw and energize each cable according to its own scroll interval.
         cableRoutes.forEach((route, index) => {
@@ -1173,17 +1154,17 @@ export default function ElectricalScene() {
                 index * 0.031) %
               Math.max(0.08, local);
             const t = THREE.MathUtils.clamp(pulseT, 0.02, Math.max(0.02, local));
-            route.pulse.position.copy(route.curve.getPointAt(t));
-            const tangent = route.curve.getTangentAt(t).normalize();
-            route.pulse.quaternion.setFromUnitVectors(
-              new THREE.Vector3(0, 1, 0),
-              tangent,
-            );
+            route.curve.getPointAt(t, route.pulsePoint);
+            route.curve.getTangentAt(t, route.tangent).normalize();
+            route.pulse.position.copy(route.pulsePoint);
+            route.pulse.quaternion.setFromUnitVectors(unitY, route.tangent);
             route.pulse.scale.setScalar(
               0.86 + Math.sin(time * 0.007 + index) * 0.16,
             );
           }
         });
+
+        const systemLive = easeProgress(0.86, 0.98, progress);
 
         // Module boot state / LEDs + subtle energized mechanical motion.
         statusModules.forEach((module, moduleIndex) => {
@@ -1208,7 +1189,11 @@ export default function ElectricalScene() {
             const pulse =
               0.65 + Math.sin(time * 0.006 + moduleIndex * 0.9 + ledIndex) * 0.35;
             material.emissiveIntensity =
-              0.02 + live * (ledIndex === 0 ? 1.8 : 1.1) * pulse;
+              0.02 +
+              live *
+                (ledIndex === 0 ? 1.8 : 1.1) *
+                pulse *
+                (1 + systemLive * 0.22);
           });
         });
 
@@ -1255,6 +1240,11 @@ export default function ElectricalScene() {
           ((mobile ? 4.5 : 7) +
             (reducedMotion.matches ? 0 : Math.max(0, Math.sin(time * 0.0048)) * 2));
         busCover.material.opacity = 0.14 + busLive * 0.07;
+        panelGlow.material.opacity =
+          0.08 +
+          busLive * 0.035 +
+          systemLive * 0.07 +
+          (reducedMotion.matches ? 0 : Math.sin(time * 0.0024) * 0.018);
 
         const scanLive = easeProgress(0.28, 0.9, progress);
         if (!reducedMotion.matches && scanLive > 0.01) {
@@ -1309,37 +1299,38 @@ export default function ElectricalScene() {
         networkPort.rotation.y =
           reducedMotion.matches ? 0 : Math.sin(time * 0.0015) * networkLive * 0.012;
 
-        // Ambient cabinet motion stays subtle; scroll remains dominant.
+        // Ambient field keeps moving without modifying the cabinet's scroll transform.
         if (!reducedMotion.matches) {
-          panelRig.rotation.x +=
-            (Math.sin(time * 0.00035) * (mobile ? 0.01 : 0.014) -
-              (panelRig.rotation.x - (mobile ? -0.03 : -0.02)) * 0.0) *
-            0.02;
-
           particles.rotation.y = -time * 0.000035;
           particles.position.y = Math.sin(time * 0.00045) * 0.18;
-          orbitGroup.rotation.z = Math.sin(time * 0.00028) * 0.12;
+          orbitGroup.rotation.z =
+            Math.sin(time * 0.00028) * 0.12 + progress * 0.18;
+          ambientRig.position.x = Math.sin(time * 0.00019) * 0.08;
+          ambientRig.position.y =
+            Math.cos(time * 0.00017) * 0.06 + Math.sin(progress * Math.PI) * 0.08;
         }
 
         const pointerFactor = mobile ? 0 : 1;
         const idleX = reducedMotion.matches ? 0 : Math.sin(time * 0.00018) * 0.08;
         const idleY = reducedMotion.matches ? 0 : Math.cos(time * 0.00016) * 0.045;
 
+        const cameraEase = 1 - Math.exp(-delta / (mobile ? 120 : 100));
         camera.position.x = THREE.MathUtils.lerp(
           camera.position.x,
           pointerX * 0.18 * pointerFactor + idleX,
-          0.035,
+          cameraEase,
         );
         camera.position.y = THREE.MathUtils.lerp(
           camera.position.y,
           -pointerY * 0.09 * pointerFactor + idleY,
-          0.035,
+          cameraEase,
         );
         camera.position.z = THREE.MathUtils.lerp(
           camera.position.z,
           (mobile ? 11.7 : 9.2) -
-            Math.sin(progress * Math.PI) * (mobile ? 0.45 : 0.72),
-          0.04,
+            Math.sin(progress * Math.PI) * (mobile ? 0.5 : 0.78) -
+            systemLive * (mobile ? 0.12 : 0.22),
+          cameraEase,
         );
 
         camera.lookAt(
@@ -1356,7 +1347,13 @@ export default function ElectricalScene() {
 
         cool.intensity =
           (mobile ? 4 : 7) +
-          easeProgress(0.32, 0.7, progress) * (mobile ? 4 : 6);
+          easeProgress(0.32, 0.7, progress) * (mobile ? 4 : 6) +
+          systemLive * (mobile ? 1.2 : 2.2);
+
+        key.intensity =
+          (mobile ? 2.6 : 3.6) +
+          systemLive *
+            (reducedMotion.matches ? 0.3 : 0.45 + Math.sin(time * 0.0019) * 0.12);
 
         renderer.render(scene, camera);
 
@@ -1414,9 +1411,10 @@ export default function ElectricalScene() {
         document.removeEventListener("visibilitychange", handleVisibility);
         reducedMotion.removeEventListener("change", handleReducedMotion);
 
-        scrollTimeline.scrollTrigger?.kill();
-        scrollTimeline.kill();
+        scrollTrigger.kill();
+        introTween.kill();
         idleTweens.forEach((tween) => tween.kill());
+        gsap.killTweensOf(introState);
         gsap.killTweensOf(panelRig.position);
         gsap.killTweensOf(panelRig.rotation);
         gsap.killTweensOf(panelRig.scale);
