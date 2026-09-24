@@ -158,12 +158,17 @@ export default function ElectricalScene() {
         new THREE.TubeGeometry(
           curve,
           detail.mainSegments,
-          cableIndex === 0 ? 0.07 : 0.065,
+          cableIndex === 0
+            ? (mobileProfile ? 0.095 : 0.07)
+            : (mobileProfile ? 0.086 : 0.065),
           detail.radialSegments,
           false,
         ),
         cableMaterial(color, cableIndex),
       );
+      if (mobileProfile) {
+        mesh.scale.setScalar(1.12);
+      }
       network.add(mesh);
       cableMeshes.push(mesh);
     });
@@ -174,7 +179,7 @@ export default function ElectricalScene() {
           metalness: 0.08,
           roughness: 0.3,
           transparent: true,
-          opacity: 0.065,
+          opacity: 0.12,
           depthWrite: false,
           side: THREE.DoubleSide,
         })
@@ -257,7 +262,11 @@ export default function ElectricalScene() {
       group.add(edgeB);
 
       const indicator = new THREE.Mesh(
-        new THREE.BoxGeometry(0.09, 0.19, 0.035),
+        new THREE.BoxGeometry(
+          mobileProfile ? 0.12 : 0.09,
+          mobileProfile ? 0.24 : 0.19,
+          mobileProfile ? 0.05 : 0.035,
+        ),
         new THREE.MeshBasicMaterial({ color: index % 2 ? YELLOW_SOFT : YELLOW }),
       );
       indicator.position.set(0.43, 0, 0);
@@ -333,7 +342,11 @@ export default function ElectricalScene() {
       const pulse = new THREE.Group();
 
       const core = new THREE.Mesh(
-        new THREE.SphereGeometry(0.065 * scale, 14, 14),
+        new THREE.SphereGeometry(
+          (mobileProfile ? 0.085 : 0.065) * scale,
+          mobileProfile ? 10 : 14,
+          mobileProfile ? 10 : 14,
+        ),
         new THREE.MeshBasicMaterial({ color: YELLOW_SOFT }),
       );
       pulse.add(core);
@@ -349,7 +362,7 @@ export default function ElectricalScene() {
             depthWrite: false,
           }),
         );
-        sprite.scale.setScalar(0.72 * scale);
+        sprite.scale.setScalar((mobileProfile ? 1.05 : 0.72) * scale);
         pulse.add(sprite);
       }
 
@@ -410,7 +423,7 @@ export default function ElectricalScene() {
           new THREE.TubeGeometry(
             curve,
             detail.branchSegments,
-            0.05,
+            mobileProfile ? 0.067 : 0.05,
             detail.branchRadial,
             false,
           ),
@@ -578,6 +591,38 @@ export default function ElectricalScene() {
     });
     root.add(depthRings);
 
+    const mobileHalo = new THREE.Group();
+    if (mobileProfile) {
+      const haloTexture = createGlowTexture();
+      if (haloTexture) {
+        const halo = new THREE.Sprite(
+          new THREE.SpriteMaterial({
+            map: haloTexture,
+            color: YELLOW,
+            transparent: true,
+            opacity: 0.2,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false,
+          }),
+        );
+        halo.scale.set(5.8, 5.8, 1);
+        halo.position.set(1.0, 0.3, -1.8);
+        mobileHalo.add(halo);
+      }
+
+      const haloRing = new THREE.Mesh(
+        new THREE.TorusGeometry(1.55, 0.02, 6, 56),
+        new THREE.MeshBasicMaterial({
+          color: YELLOW,
+          transparent: true,
+          opacity: 0.2,
+        }),
+      );
+      haloRing.rotation.set(1.0, 0.3, 0.8);
+      mobileHalo.add(haloRing);
+      root.add(mobileHalo);
+    }
+
     let progress = 0;
     let targetProgress = 0;
     let pointerX = 0;
@@ -611,12 +656,12 @@ export default function ElectricalScene() {
 
       const mobile = width < 820 || coarsePointer.matches;
       renderer.setPixelRatio(
-        Math.min(window.devicePixelRatio, mobile ? 1.15 : detail.maxPixelRatio),
+        Math.min(window.devicePixelRatio, mobile ? 1.22 : detail.maxPixelRatio),
       );
-      root.position.x = mobile ? 0.08 : 0;
-      root.position.y = mobile ? -0.32 : 0;
-      root.scale.setScalar(mobile ? 0.68 : width < 1180 ? 0.92 : 1);
-      camera.position.z = mobile ? 11.6 : 8.4;
+      root.position.x = mobile ? 0.46 : 0;
+      root.position.y = mobile ? -0.44 : 0;
+      root.scale.setScalar(mobile ? 0.88 : width < 1180 ? 0.92 : 1);
+      camera.position.z = mobile ? 9.25 : 8.4;
     };
 
     const renderScene = (time = 0) => {
@@ -639,7 +684,8 @@ export default function ElectricalScene() {
       const activePoint = backbone.getPointAt(activeT);
 
       branchGroups.forEach((branch, index) => {
-        const reveal = smoothStep(branch.start, branch.start + 0.13, progress);
+        const branchStart = mobileProfile ? Math.max(0, branch.start - 0.1) : branch.start;
+        const reveal = smoothStep(branchStart, branchStart + (mobileProfile ? 0.1 : 0.13), progress);
         const scale = Math.max(0.015, reveal);
         branch.group.scale.setScalar(scale);
         branch.group.visible = reveal > 0.01;
@@ -681,7 +727,7 @@ export default function ElectricalScene() {
 
       arcLines.forEach((line, index) => {
         const material = line.material;
-        const mobileArcStrength = mobileProfile ? 0.46 : 0.72;
+        const mobileArcStrength = mobileProfile ? 0.68 : 0.72;
         material.opacity = still
           ? 0.12
           : Math.max(0, Math.sin(time * 0.012 + index * 1.8)) * mobileArcStrength;
@@ -690,13 +736,25 @@ export default function ElectricalScene() {
       if (!still) {
         particles.rotation.y = time * 0.000018;
         depthRings.rotation.z = time * 0.000025;
+        if (mobileProfile) {
+          mobileHalo.rotation.z = time * 0.00008;
+          mobileHalo.scale.setScalar(0.95 + Math.sin(time * 0.0018) * 0.05);
+        }
       }
 
       const mobileFrame = window.innerWidth < 820 || coarsePointer.matches;
-      const sceneTurn = progress * (mobileFrame ? 0.38 : 0.72);
-      network.rotation.y = sceneTurn + (mobileFrame ? 0 : pointerX * 0.08);
-      network.rotation.z = -0.05 + Math.sin(progress * Math.PI * 2) * 0.055;
-      network.position.y = Math.sin(progress * Math.PI) * 0.16;
+      const sceneTurn = progress * (mobileFrame ? 0.58 : 0.72);
+      network.rotation.y =
+        sceneTurn + (mobileFrame ? -0.28 + Math.sin(progress * Math.PI) * 0.22 : pointerX * 0.08);
+      network.rotation.x = mobileFrame ? -0.08 + progress * 0.12 : 0;
+      network.rotation.z =
+        (mobileFrame ? -0.14 : -0.05) +
+        Math.sin(progress * Math.PI * 2) * (mobileFrame ? 0.09 : 0.055);
+      network.position.x = mobileFrame
+        ? 0.5 - smoothStep(0.1, 0.55, progress) * 0.85 + smoothStep(0.7, 1, progress) * 0.45
+        : 0;
+      network.position.y =
+        (mobileFrame ? -0.35 : 0) + Math.sin(progress * Math.PI) * (mobileFrame ? 0.32 : 0.16);
 
       const xDrift = mobileFrame ? 0 : pointerX * 0.2;
       const yDrift = mobileFrame ? 0 : -pointerY * 0.11;
@@ -704,14 +762,19 @@ export default function ElectricalScene() {
       camera.position.y = THREE.MathUtils.lerp(camera.position.y, yDrift, 0.04);
       camera.position.z = THREE.MathUtils.lerp(
         camera.position.z,
-        (mobileFrame ? 11.6 : 8.4) -
-          Math.sin(progress * Math.PI) * (mobileFrame ? 0.45 : 0.72),
+        (mobileFrame ? 9.25 : 8.4) -
+          Math.sin(progress * Math.PI) * (mobileFrame ? 0.55 : 0.72),
         0.035,
       );
-      camera.lookAt(0.75, -0.15, -0.2);
+      camera.lookAt(
+        mobileFrame ? 0.55 - smoothStep(0.15, 0.7, progress) * 0.38 : 0.75,
+        mobileFrame ? -0.28 + Math.sin(progress * Math.PI) * 0.18 : -0.15,
+        -0.2,
+      );
 
       warmLight.position.copy(activePoint).add(new THREE.Vector3(0.3, 0.2, 1.7));
-      warmLight.intensity = 15 + Math.sin(time * 0.007) * 2.5;
+      warmLight.intensity =
+        (mobileFrame ? 22 : 15) + Math.sin(time * 0.007) * (mobileFrame ? 4 : 2.5);
       renderer.render(scene, camera);
 
       if (!still) frame = window.requestAnimationFrame(renderScene);
