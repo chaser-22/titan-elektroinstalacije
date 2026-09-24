@@ -591,6 +591,156 @@ export default function ElectricalScene() {
     });
     root.add(depthRings);
 
+    // A second, deeper motion layer keeps the scene alive even when the user is not scrolling.
+    const ambientField = new THREE.Group();
+    ambientField.position.z = -1.6;
+    root.add(ambientField);
+
+    const ghostConduits = new THREE.Group();
+    ambientField.add(ghostConduits);
+
+    const ghostDefinitions = mobileProfile
+      ? [
+          {
+            color: YELLOW,
+            opacity: 0.16,
+            points: [
+              new THREE.Vector3(-2.9, 5.4, -1.4),
+              new THREE.Vector3(-2.0, 2.7, -2.0),
+              new THREE.Vector3(-2.8, 0.1, -1.7),
+              new THREE.Vector3(-1.8, -2.5, -2.2),
+              new THREE.Vector3(-2.4, -5.2, -1.6),
+            ],
+          },
+          {
+            color: 0x5f7fff,
+            opacity: 0.1,
+            points: [
+              new THREE.Vector3(3.2, 5.1, -2.5),
+              new THREE.Vector3(2.1, 2.5, -2.0),
+              new THREE.Vector3(3.0, -0.3, -2.6),
+              new THREE.Vector3(2.0, -2.8, -2.1),
+              new THREE.Vector3(2.7, -5.0, -2.5),
+            ],
+          },
+        ]
+      : [
+          {
+            color: YELLOW,
+            opacity: 0.14,
+            points: [
+              new THREE.Vector3(-3.6, 5.5, -2.3),
+              new THREE.Vector3(-2.4, 2.8, -2.9),
+              new THREE.Vector3(-3.3, 0.2, -2.2),
+              new THREE.Vector3(-2.1, -2.6, -3.0),
+              new THREE.Vector3(-3.0, -5.3, -2.4),
+            ],
+          },
+          {
+            color: 0x5f7fff,
+            opacity: 0.09,
+            points: [
+              new THREE.Vector3(3.9, 5.4, -3.0),
+              new THREE.Vector3(2.6, 2.5, -2.5),
+              new THREE.Vector3(3.6, -0.1, -3.2),
+              new THREE.Vector3(2.4, -2.9, -2.6),
+              new THREE.Vector3(3.2, -5.2, -3.1),
+            ],
+          },
+          {
+            color: 0xb7c2d8,
+            opacity: 0.065,
+            points: [
+              new THREE.Vector3(-0.8, 5.8, -4.0),
+              new THREE.Vector3(0.8, 3.0, -3.5),
+              new THREE.Vector3(-0.5, 0.4, -4.2),
+              new THREE.Vector3(1.0, -2.4, -3.6),
+              new THREE.Vector3(-0.3, -5.4, -4.1),
+            ],
+          },
+        ];
+
+    ghostDefinitions.forEach((definition, index) => {
+      const curve = new THREE.CatmullRomCurve3(definition.points);
+      curve.curveType = "catmullrom";
+      curve.tension = 0.36;
+
+      const tube = new THREE.Mesh(
+        new THREE.TubeGeometry(
+          curve,
+          mobileProfile ? 70 : 120,
+          mobileProfile ? 0.026 : 0.022,
+          6,
+          false,
+        ),
+        new THREE.MeshBasicMaterial({
+          color: definition.color,
+          transparent: true,
+          opacity: definition.opacity,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false,
+        }),
+      );
+      tube.rotation.z = (index - 1) * 0.08;
+      ghostConduits.add(tube);
+    });
+
+    const ambientOrbits = new THREE.Group();
+    ambientField.add(ambientOrbits);
+
+    const orbitCount = mobileProfile ? 3 : 5;
+    for (let index = 0; index < orbitCount; index += 1) {
+      const ring = new THREE.Mesh(
+        new THREE.TorusGeometry(
+          1.6 + index * 0.48,
+          index === 0 ? 0.018 : 0.011,
+          6,
+          mobileProfile ? 44 : 72,
+        ),
+        new THREE.MeshBasicMaterial({
+          color: index % 2 === 0 ? YELLOW : 0x65738c,
+          transparent: true,
+          opacity: index === 0 ? 0.18 : 0.07,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false,
+        }),
+      );
+      ring.position.set(
+        index % 2 === 0 ? 1.8 : -1.2,
+        (index - (orbitCount - 1) / 2) * 1.18,
+        -0.4 - index * 0.38,
+      );
+      ring.rotation.set(
+        0.5 + index * 0.31,
+        0.35 + index * 0.22,
+        index * 0.58,
+      );
+      ambientOrbits.add(ring);
+    }
+
+    const sparkCount = mobileProfile ? 42 : 100;
+    const sparkPositions = new Float32Array(sparkCount * 3);
+    for (let index = 0; index < sparkCount; index += 1) {
+      sparkPositions[index * 3] = (random() - 0.5) * 8.5;
+      sparkPositions[index * 3 + 1] = (random() - 0.5) * 11.5;
+      sparkPositions[index * 3 + 2] = (random() - 0.5) * 4.5 - 1.5;
+    }
+    const sparkGeometry = new THREE.BufferGeometry();
+    sparkGeometry.setAttribute("position", new THREE.BufferAttribute(sparkPositions, 3));
+    const sparks = new THREE.Points(
+      sparkGeometry,
+      new THREE.PointsMaterial({
+        color: YELLOW_SOFT,
+        size: mobileProfile ? 0.034 : 0.028,
+        transparent: true,
+        opacity: mobileProfile ? 0.42 : 0.34,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        sizeAttenuation: true,
+      }),
+    );
+    ambientField.add(sparks);
+
     const mobileHalo = new THREE.Group();
     if (mobileProfile) {
       const haloTexture = glowTexture;
@@ -689,8 +839,11 @@ export default function ElectricalScene() {
         const scale = Math.max(0.015, reveal);
         branch.group.scale.setScalar(scale);
         branch.group.visible = reveal > 0.01;
-        branch.endpoint.rotation.x = still ? 0.2 : Math.sin(time * 0.0012 + index) * 0.18;
-        branch.endpoint.rotation.y = still ? 0.25 : time * 0.00035 * (index % 2 ? -1 : 1);
+        branch.group.rotation.z = still
+          ? 0
+          : Math.sin(time * 0.00065 + index * 1.8) * (mobileProfile ? 0.025 : 0.035);
+        branch.endpoint.rotation.x = still ? 0.2 : Math.sin(time * 0.0012 + index) * 0.2;
+        branch.endpoint.rotation.y = still ? 0.25 : time * 0.00042 * (index % 2 ? -1 : 1);
         branch.connectorMaterial.emissiveIntensity =
           0.05 + (index === activeBranch ? 0.78 * (0.6 + 0.4 * Math.sin(time * 0.006)) : 0.04);
       });
@@ -711,8 +864,18 @@ export default function ElectricalScene() {
       cableMeshes.forEach((mesh, index) => {
         const separation = smoothStep(0.22, 0.56, progress) * (1 - smoothStep(0.78, 0.98, progress));
         const angle = (index / cableMeshes.length) * Math.PI * 2;
-        mesh.position.x = Math.cos(angle) * separation * 0.12;
-        mesh.position.z = Math.sin(angle) * separation * 0.12;
+        const ambientBreath = still
+          ? 0
+          : Math.sin(time * 0.00135 + index * 1.17) * (mobileProfile ? 0.025 : 0.035);
+        mesh.position.x =
+          Math.cos(angle) * separation * 0.12 +
+          Math.cos(angle + time * 0.00018) * ambientBreath;
+        mesh.position.y = still
+          ? 0
+          : Math.sin(time * 0.00105 + index * 0.9) * (mobileProfile ? 0.012 : 0.018);
+        mesh.position.z =
+          Math.sin(angle) * separation * 0.12 +
+          Math.sin(angle + time * 0.00016) * ambientBreath;
       });
 
       terminalGroup.rotation.y = still ? 0.3 : time * 0.00025;
@@ -734,18 +897,44 @@ export default function ElectricalScene() {
       });
 
       if (!still) {
-        particles.rotation.y = time * 0.000018;
-        depthRings.rotation.z = time * 0.000025;
+        particles.rotation.y = time * 0.000055;
+        particles.rotation.x = Math.sin(time * 0.00012) * 0.04;
+        particles.position.y = Math.sin(time * 0.00028) * 0.16;
+
+        depthRings.rotation.z = time * 0.000055;
+        depthRings.rotation.y = Math.sin(time * 0.00016) * 0.12;
+
+        ghostConduits.rotation.y = Math.sin(time * 0.00022) * 0.18;
+        ghostConduits.rotation.z = Math.sin(time * 0.00017) * 0.06;
+        ghostConduits.position.y = Math.sin(time * 0.00042) * 0.22;
+
+        ambientOrbits.rotation.y = time * 0.000095;
+        ambientOrbits.rotation.z = -time * 0.000055;
+        ambientOrbits.children.forEach((orbit: any, index: number) => {
+          orbit.rotation.x += 0.00045 * (index % 2 === 0 ? 1 : -1);
+          orbit.rotation.z += 0.00032 * (index % 2 === 0 ? -1 : 1);
+        });
+
+        sparks.rotation.y = -time * 0.00009;
+        sparks.position.y = Math.sin(time * 0.00065) * 0.26;
+        sparks.position.x = Math.cos(time * 0.00038) * 0.14;
+
+        ambientField.rotation.z = Math.sin(time * 0.00013) * 0.025;
+        ambientField.position.x = Math.sin(time * 0.00019) * 0.14;
+
         if (mobileProfile) {
-          mobileHalo.rotation.z = time * 0.00008;
-          mobileHalo.scale.setScalar(0.95 + Math.sin(time * 0.0018) * 0.05);
+          mobileHalo.rotation.z = time * 0.00012;
+          mobileHalo.scale.setScalar(0.94 + Math.sin(time * 0.0022) * 0.07);
         }
       }
 
       const mobileFrame = window.innerWidth < 820 || coarsePointer.matches;
+      const idleTurn = still ? 0 : Math.sin(time * 0.00024) * (mobileFrame ? 0.055 : 0.08);
       const sceneTurn = progress * (mobileFrame ? 0.58 : 0.72);
       network.rotation.y =
-        sceneTurn + (mobileFrame ? -0.28 + Math.sin(progress * Math.PI) * 0.22 : pointerX * 0.08);
+        sceneTurn +
+        idleTurn +
+        (mobileFrame ? -0.28 + Math.sin(progress * Math.PI) * 0.22 : pointerX * 0.08);
       network.rotation.x = mobileFrame ? -0.08 + progress * 0.12 : 0;
       network.rotation.z =
         (mobileFrame ? -0.14 : -0.05) +
@@ -756,8 +945,10 @@ export default function ElectricalScene() {
       network.position.y =
         (mobileFrame ? -0.35 : 0) + Math.sin(progress * Math.PI) * (mobileFrame ? 0.32 : 0.16);
 
-      const xDrift = mobileFrame ? 0 : pointerX * 0.2;
-      const yDrift = mobileFrame ? 0 : -pointerY * 0.11;
+      const idleCameraX = still ? 0 : Math.sin(time * 0.00021) * (mobileFrame ? 0.085 : 0.15);
+      const idleCameraY = still ? 0 : Math.cos(time * 0.00017) * (mobileFrame ? 0.045 : 0.075);
+      const xDrift = (mobileFrame ? 0 : pointerX * 0.2) + idleCameraX;
+      const yDrift = (mobileFrame ? 0 : -pointerY * 0.11) + idleCameraY;
       camera.position.x = THREE.MathUtils.lerp(camera.position.x, xDrift, 0.04);
       camera.position.y = THREE.MathUtils.lerp(camera.position.y, yDrift, 0.04);
       camera.position.z = THREE.MathUtils.lerp(
@@ -774,7 +965,9 @@ export default function ElectricalScene() {
 
       warmLight.position.copy(activePoint).add(new THREE.Vector3(0.3, 0.2, 1.7));
       warmLight.intensity =
-        (mobileFrame ? 22 : 15) + Math.sin(time * 0.007) * (mobileFrame ? 4 : 2.5);
+        (mobileFrame ? 22 : 15) +
+        Math.sin(time * 0.007) * (mobileFrame ? 4 : 2.5) +
+        Math.sin(time * 0.0013) * 1.4;
       renderer.render(scene, camera);
 
       if (!still) frame = window.requestAnimationFrame(renderScene);
