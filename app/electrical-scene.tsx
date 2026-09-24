@@ -58,18 +58,21 @@ export default function ElectricalScene() {
 
       const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
       const coarsePointer = window.matchMedia("(pointer: coarse)");
-      const mobile =
-        Math.min(window.innerWidth, mount.clientWidth || window.innerWidth) < 820 ||
-        coarsePointer.matches;
+      const viewportWidth = Math.min(
+        window.innerWidth,
+        mount.clientWidth || window.innerWidth,
+      );
+      const mobile = viewportWidth < 820 || coarsePointer.matches;
+      const phone = viewportWidth < 520;
 
       const detail = mobile
         ? {
-            cableSegments: 42,
-            cableRadial: 6,
-            particles: 70,
-            maxPixelRatio: 1.2,
+            cableSegments: phone ? 34 : 42,
+            cableRadial: phone ? 5 : 6,
+            particles: phone ? 44 : 70,
+            maxPixelRatio: phone ? 1.0 : 1.15,
             targetFrameMs: 1000 / 40,
-            terminalCount: 8,
+            terminalCount: phone ? 7 : 8,
           }
         : {
             cableSegments: 82,
@@ -83,8 +86,13 @@ export default function ElectricalScene() {
       const scene = new THREE.Scene();
       scene.fog = new THREE.FogExp2(DARK, mobile ? 0.055 : 0.047);
 
-      const camera = new THREE.PerspectiveCamera(mobile ? 43 : 38, 1, 0.1, 60);
-      camera.position.set(0, 0.1, mobile ? 11.7 : 9.2);
+      const camera = new THREE.PerspectiveCamera(
+        phone ? 45 : mobile ? 43 : 38,
+        1,
+        0.1,
+        60,
+      );
+      camera.position.set(0, 0.1, phone ? 12.15 : mobile ? 11.7 : 9.2);
 
       const renderer = new THREE.WebGLRenderer({
         alpha: true,
@@ -1055,7 +1063,11 @@ export default function ElectricalScene() {
         renderer.setPixelRatio(
           Math.min(
             window.devicePixelRatio,
-            width < 820 || coarsePointer.matches ? 1.2 : detail.maxPixelRatio,
+            width < 520
+              ? 1.0
+              : width < 820 || coarsePointer.matches
+                ? 1.15
+                : detail.maxPixelRatio,
           ),
         );
       };
@@ -1091,9 +1103,9 @@ export default function ElectricalScene() {
         // One deterministic cabinet transform for the whole scroll range.
         const firstHalf = easeProgress(0, 0.52, progress);
         const secondHalf = easeProgress(0.52, 1, progress);
-        const startX = mobile ? 1.18 : 2.08;
-        const middleX = mobile ? 0.94 : 1.84;
-        const endX = mobile ? 1.08 : 2.14;
+        const startX = phone ? 1.52 : mobile ? 1.18 : 2.08;
+        const middleX = phone ? 1.3 : mobile ? 0.94 : 1.84;
+        const endX = phone ? 1.46 : mobile ? 1.08 : 2.14;
         const baseX = THREE.MathUtils.lerp(
           THREE.MathUtils.lerp(startX, middleX, firstHalf),
           endX,
@@ -1120,8 +1132,8 @@ export default function ElectricalScene() {
         const idleCabinet =
           reducedMotion.matches ? 0 : Math.sin(time * 0.00032) * (mobile ? 0.012 : 0.018);
         const baseScale = THREE.MathUtils.lerp(
-          mobile ? 0.7 : 0.87,
-          mobile ? 0.79 : 0.97,
+          phone ? 0.62 : mobile ? 0.7 : 0.87,
+          phone ? 0.7 : mobile ? 0.79 : 0.97,
           easeProgress(0.05, 0.58, progress),
         );
 
@@ -1306,7 +1318,8 @@ export default function ElectricalScene() {
           orbitGroup.rotation.z =
             Math.sin(time * 0.00028) * 0.12 + progress * 0.18;
           ambientRig.position.x =
-            (mobile ? 0.58 : 1.08) + Math.sin(time * 0.00019) * 0.08;
+            (phone ? 0.84 : mobile ? 0.58 : 1.08) +
+            Math.sin(time * 0.00019) * 0.08;
           ambientRig.position.y =
             Math.cos(time * 0.00017) * 0.06 + Math.sin(progress * Math.PI) * 0.08;
         }
@@ -1328,14 +1341,14 @@ export default function ElectricalScene() {
         );
         camera.position.z = THREE.MathUtils.lerp(
           camera.position.z,
-          (mobile ? 11.7 : 9.2) -
-            Math.sin(progress * Math.PI) * (mobile ? 0.5 : 0.78) -
-            systemLive * (mobile ? 0.12 : 0.22),
+          (phone ? 12.15 : mobile ? 11.7 : 9.2) -
+            Math.sin(progress * Math.PI) * (phone ? 0.34 : mobile ? 0.5 : 0.78) -
+            systemLive * (phone ? 0.08 : mobile ? 0.12 : 0.22),
           cameraEase,
         );
 
         camera.lookAt(
-          mobile ? 0.24 : 0.6,
+          phone ? 0.18 : mobile ? 0.24 : 0.6,
           -0.12 + Math.sin(progress * Math.PI) * 0.12,
           -0.12,
         );
