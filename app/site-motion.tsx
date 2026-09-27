@@ -99,9 +99,9 @@ export default function SiteMotion() {
         const value = Math.min(100, Math.max(0, progress.value));
         const displayValue = value >= 99.95 ? 100 : Math.floor(value);
         progressValue.textContent = String(displayValue).padStart(2, "0");
-        loader.style.setProperty("--loader-charge", `${value * 3.6}deg`);
+        loader.style.setProperty("--loader-progress", `${value}%`);
 
-        const nextStage = value >= 99.8 ? 4 : value >= 72 ? 3 : value >= 42 ? 2 : value >= 14 ? 1 : 0;
+        const nextStage = value >= 92 ? 4 : value >= 72 ? 3 : value >= 42 ? 2 : value >= 14 ? 1 : 0;
         if (nextStage !== powerStage) {
           powerStage = nextStage;
           loader.dataset.powerStage = String(powerStage);
@@ -122,6 +122,10 @@ export default function SiteMotion() {
 
       let entranceTimeline: any = null;
       let progressTween: any = null;
+      let finishPowerSequence = () => {};
+      const powerSequenceComplete = new Promise<void>((resolve) => {
+        finishPowerSequence = resolve;
+      });
 
       const context = gsap.context(() => {
         if (reducedMotion) {
@@ -179,10 +183,14 @@ export default function SiteMotion() {
           .to(loaderMeta, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }, 0.18);
 
         progressTween = gsap.to(progress, {
-          value: 96.5,
-          duration: 3.55,
+          value: 100,
+          duration: 3.2,
           ease: "power1.inOut",
           onUpdate: renderProgress,
+          onComplete: () => {
+            renderProgress();
+            minimumTimer = window.setTimeout(finishPowerSequence, 800);
+          },
         });
 
         const revealElements = Array.from(
@@ -457,12 +465,12 @@ export default function SiteMotion() {
             sceneFallback = window.setTimeout(done, 1800);
           });
 
-      const waitMinimum = new Promise<void>((resolve) => {
-        minimumTimer = window.setTimeout(resolve, reducedMotion ? 80 : 3550);
-      });
+      const waitForPowerSequence = reducedMotion
+        ? Promise.resolve()
+        : powerSequenceComplete;
 
       try {
-        await Promise.all([waitForWindow, waitForScene, waitMinimum]);
+        await Promise.all([waitForWindow, waitForScene, waitForPowerSequence]);
         if (!active) return;
 
         if (reducedMotion) {
@@ -481,21 +489,6 @@ export default function SiteMotion() {
             },
           });
         } else {
-          progressTween?.kill();
-          await new Promise<void>((resolve) => {
-            gsap.to(progress, {
-              value: 100,
-              duration: 0.35,
-              ease: "power1.inOut",
-              onUpdate: renderProgress,
-              onComplete: resolve,
-            });
-          });
-
-          await new Promise<void>((resolve) => {
-            minimumTimer = window.setTimeout(resolve, 180);
-          });
-
           if (!active) return;
           entranceTimeline?.play(0);
         }
@@ -555,8 +548,6 @@ export default function SiteMotion() {
           </svg>
 
           <div className="site-loader__power-core">
-            <span className="site-loader__charge-ring" />
-            <span className="site-loader__charge-ring-mask" />
             <i className="site-loader__arc site-loader__arc--one" />
             <i className="site-loader__arc site-loader__arc--two" />
             <span className="site-loader__core-ring" />
@@ -572,6 +563,15 @@ export default function SiteMotion() {
           <span><i />MREŽA <b>230V</b></span>
           <span><i />BUS <b>24V</b></span>
           <span><i />PLC <b>I/O</b></span>
+        </div>
+
+        <div className="site-loader__bus-meter" aria-hidden="true">
+          <span className="site-loader__bus-label">ENERGETSKA SABIRNICA</span>
+          <div className="site-loader__bus-track">
+            <i className="site-loader__bus-charge" />
+            <b className="site-loader__bus-head" />
+          </div>
+          <span className="site-loader__bus-voltage">0 — 230V</span>
         </div>
 
         <div className="site-loader__circuit" aria-hidden="true">
