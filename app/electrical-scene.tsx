@@ -1147,10 +1147,20 @@ export default function ElectricalScene() {
       };
 
       const render = (time = 0) => {
+        const loaderIdle =
+          document.body.classList.contains("motion-enabled") &&
+          !document.body.classList.contains("site-entering") &&
+          !document.body.classList.contains("site-entered");
+
+        const frameBudget = loaderIdle
+          ? 1000 / 18
+          : mobile
+            ? detail.targetFrameMs
+            : 0;
+
         if (
-          mobile &&
-          detail.targetFrameMs > 0 &&
-          time - lastRenderTime < detail.targetFrameMs &&
+          frameBudget > 0 &&
+          time - lastRenderTime < frameBudget &&
           !reducedMotion.matches
         ) {
           frame = window.requestAnimationFrame(render);
