@@ -35,11 +35,6 @@ export default function SiteMotion() {
       const scene = document.querySelector<HTMLElement>(".three-scene--plc");
       const announcement = document.querySelector<HTMLElement>(".announcement");
       const header = document.querySelector<HTMLElement>(".site-header");
-      const headerBrand = header?.querySelector<HTMLElement>(".brand");
-      const headerLinks = header
-        ? Array.from(header.querySelectorAll<HTMLElement>("nav a"))
-        : [];
-      const headerButton = header?.querySelector<HTMLElement>(".button");
 
       const heroEyebrow = document.querySelector<HTMLElement>('[data-hero="eyebrow"]');
       const heroHeading = document.querySelector<HTMLElement>('[data-hero="heading"]');
@@ -56,6 +51,37 @@ export default function SiteMotion() {
       const topPanel = loader.querySelector<HTMLElement>(".site-loader__panel--top");
       const bottomPanel = loader.querySelector<HTMLElement>(".site-loader__panel--bottom");
 
+      if (
+        !scene ||
+        !announcement ||
+        !header ||
+        !heroEyebrow ||
+        !heroHeading ||
+        !heroText ||
+        !heroActions ||
+        !heroDisciplines ||
+        !heroCue ||
+        !progressValue ||
+        !progressFill ||
+        !loaderBrand ||
+        !loaderMeta ||
+        !loaderCircuit ||
+        !topPanel ||
+        !bottomPanel
+      ) {
+        loader.style.display = "none";
+        return;
+      }
+
+      const headerBrand = header.querySelector<HTMLElement>(".brand");
+      const headerButton = header.querySelector<HTMLElement>(".button");
+      const headerLinks = Array.from(header.querySelectorAll<HTMLElement>("nav a"));
+
+      if (!headerBrand || !headerButton) {
+        loader.style.display = "none";
+        return;
+      }
+
       const unlockScroll = () => {
         body.style.overflow = previousBodyOverflow;
         root.style.overflow = previousHtmlOverflow;
@@ -68,8 +94,8 @@ export default function SiteMotion() {
       const progress = { value: 0 };
       const renderProgress = () => {
         const value = Math.round(progress.value);
-        if (progressValue) progressValue.textContent = String(value).padStart(2, "0");
-        if (progressFill) progressFill.style.transform = `scaleX(${value / 100})`;
+        progressValue.textContent = String(value).padStart(2, "0");
+        progressFill.style.transform = `scaleX(${value / 100})`;
       };
 
       let entranceTimeline: ReturnType<typeof gsap.timeline> | null = null;
@@ -90,7 +116,7 @@ export default function SiteMotion() {
               heroActions,
               heroDisciplines,
               heroCue,
-            ].filter(Boolean),
+            ],
             { clearProps: "all" },
           );
           return;
@@ -104,7 +130,7 @@ export default function SiteMotion() {
           filter: "blur(8px)",
           "--header-line-progress": 0,
         });
-        gsap.set([headerBrand, ...headerLinks, headerButton].filter(Boolean), {
+        gsap.set([headerBrand, ...headerLinks, headerButton], {
           opacity: 0,
           y: -8,
         });
@@ -121,7 +147,7 @@ export default function SiteMotion() {
         gsap.set(heroDisciplines, { opacity: 0, y: mobile ? 10 : 16 });
         gsap.set(heroCue, { opacity: 0, y: 10 });
 
-        gsap.set([loaderBrand, loaderMeta, loaderCircuit].filter(Boolean), { opacity: 0, y: 12 });
+        gsap.set([loaderBrand, loaderMeta, loaderCircuit], { opacity: 0, y: 12 });
 
         gsap
           .timeline()
