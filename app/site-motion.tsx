@@ -550,8 +550,8 @@ export default function SiteMotion() {
 
         <div className="site-loader__power" aria-hidden="true">
           <svg className="site-loader__schematic" viewBox="0 0 560 186" preserveAspectRatio="none">
-            <path className="site-loader__wire site-loader__wire--base" d="M8 92H92V42H196V92H280V144H386V92H552" />
-            <path className="site-loader__wire site-loader__wire--live" d="M8 92H92V42H196V92H280V144H386V92H552" />
+            <path className="site-loader__wire site-loader__wire--base" pathLength="1" d="M8 92H92V42H196V92H280V144H386V92H552" />
+            <path className="site-loader__wire site-loader__wire--live" pathLength="1" d="M8 92H92V42H196V92H280V144H386V92H552" />
             <path className="site-loader__branch" d="M196 42V14M280 144V174M386 92V38" />
             <circle cx="92" cy="92" r="5" />
             <circle cx="196" cy="42" r="5" />
