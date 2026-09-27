@@ -158,18 +158,17 @@ export default function SiteMotion() {
       };
 
       const setCompleteLoaderState = () => {
-        liveWires.forEach((path, index) => {
+        liveWires.forEach((path) => {
           gsap.set(path, {
-            strokeDasharray: wireLengths[index],
+            strokeDasharray: "none",
             strokeDashoffset: 0,
             opacity: 1,
           });
         });
 
-        liveBranches.forEach((path, index) => {
-          const lengthIndex = liveWires.length + index;
+        liveBranches.forEach((path) => {
           gsap.set(path, {
-            strokeDasharray: wireLengths[lengthIndex],
+            strokeDasharray: "none",
             strokeDashoffset: 0,
             opacity: 1,
           });
@@ -359,6 +358,7 @@ export default function SiteMotion() {
             strokeDashoffset: 0,
             duration: 0.42,
             ease: "power1.inOut",
+            onComplete: () => gsap.set(liveWires[0], { strokeDasharray: "none", strokeDashoffset: 0 }),
           }, 0.5);
           master.to(powerNodes[1], {
             fill: "#f4b700",
@@ -375,12 +375,14 @@ export default function SiteMotion() {
             strokeDashoffset: 0,
             duration: 0.46,
             ease: "power1.inOut",
+            onComplete: () => gsap.set(liveWires[1], { strokeDasharray: "none", strokeDashoffset: 0 }),
           }, 0.94);
           master.set(liveBranches[0], { opacity: 1 }, 1.15);
           master.to(liveBranches[0], {
             strokeDashoffset: 0,
             duration: 0.22,
             ease: "power1.inOut",
+            onComplete: () => gsap.set(liveBranches[0], { strokeDasharray: "none", strokeDashoffset: 0 }),
           }, 1.15);
           master.to(powerNodes[2], {
             fill: "#f4b700",
@@ -409,12 +411,14 @@ export default function SiteMotion() {
             strokeDashoffset: 0,
             duration: 0.68,
             ease: "power1.inOut",
+            onComplete: () => gsap.set(liveWires[2], { strokeDasharray: "none", strokeDashoffset: 0 }),
           }, 1.44);
           master.set(liveBranches[1], { opacity: 1 }, 1.86);
           master.to(liveBranches[1], {
             strokeDashoffset: 0,
             duration: 0.24,
             ease: "power1.inOut",
+            onComplete: () => gsap.set(liveBranches[1], { strokeDasharray: "none", strokeDashoffset: 0 }),
           }, 1.86);
           master.to(powerNodes[3], {
             fill: "#f4b700",
@@ -444,12 +448,14 @@ export default function SiteMotion() {
             strokeDashoffset: 0,
             duration: 0.58,
             ease: "power1.inOut",
+            onComplete: () => gsap.set(liveWires[3], { strokeDasharray: "none", strokeDashoffset: 0 }),
           }, 2.14);
           master.set(liveBranches[2], { opacity: 1 }, 2.46);
           master.to(liveBranches[2], {
             strokeDashoffset: 0,
             duration: 0.24,
             ease: "power1.inOut",
+            onComplete: () => gsap.set(liveBranches[2], { strokeDasharray: "none", strokeDashoffset: 0 }),
           }, 2.46);
           master.to(powerNodes[4], {
             fill: "#f4b700",
@@ -477,6 +483,7 @@ export default function SiteMotion() {
             strokeDashoffset: 0,
             duration: 0.44,
             ease: "power1.inOut",
+            onComplete: () => gsap.set(liveWires[4], { strokeDasharray: "none", strokeDashoffset: 0 }),
           }, 2.74);
           master.to(powerNodes[5], {
             fill: "#f4b700",
@@ -508,10 +515,7 @@ export default function SiteMotion() {
           master.to(loaderPower, { "--loader-core-glow": 1, duration: 0.28 }, 3.12);
 
           master.call(() => {
-            progress.value = 100;
-            renderProgress();
-            setStatus("SISTEM POD NAPONOM");
-            loader.classList.add("is-complete");
+            setCompleteLoaderState();
           }, [], 3.35);
 
           // Explicit completed-state hold. Nothing electrical is still animating here.
@@ -889,7 +893,7 @@ export default function SiteMotion() {
           <svg
             className="site-loader__schematic"
             viewBox="0 0 560 186"
-            preserveAspectRatio="none"
+            preserveAspectRatio="xMidYMid meet"
           >
             <g className="site-loader__base-wires">
               <path d="M8 92H92" />
