@@ -2086,6 +2086,7 @@ footer > a:last-child { display: flex; min-height: 44px; align-items: center; ju
     #070b14;
   background-size: 72px 72px, 72px 72px, auto, auto;
   will-change: transform;
+  backface-visibility: hidden;
 }
 
 .site-loader__panel--top {
@@ -2101,6 +2102,8 @@ footer > a:last-child { display: flex; min-height: 44px; align-items: center; ju
   position: relative;
   z-index: 2;
   width: min(980px, 82vw);
+  will-change: opacity, transform;
+  backface-visibility: hidden;
 }
 
 .site-loader__brand {
@@ -2602,3 +2605,18 @@ footer > a:last-child { display: flex; min-height: 44px; align-items: center; ju
   }
 }
 
+
+
+/* Loader handoff compositing */
+.motion-enabled .three-scene--plc {
+  will-change: opacity;
+}
+
+.motion-enabled .site-header,
+.motion-enabled [data-hero="heading"],
+.motion-enabled [data-hero="eyebrow"],
+.motion-enabled [data-hero="text"],
+.motion-enabled [data-hero="actions"],
+.motion-enabled [data-hero="disciplines"] {
+  backface-visibility: hidden;
+}
