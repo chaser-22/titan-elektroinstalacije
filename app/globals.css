@@ -3341,3 +3341,173 @@ footer > a:last-child { display: flex; min-height: 44px; align-items: center; ju
     animation: none !important;
   }
 }
+
+
+/* Loader v4: circuit-only progress, guaranteed complete state */
+.site-loader__bus-meter,
+.site-loader__circuit,
+.site-loader__progress {
+  display: none !important;
+}
+
+.site-loader__content {
+  width: min(940px, calc(100vw - 64px));
+}
+
+.site-loader__power {
+  height: 372px;
+  margin-top: 40px;
+}
+
+.site-loader__power-core {
+  width: 212px;
+  height: 212px;
+}
+
+.site-loader__core-ring {
+  inset: 32px;
+}
+
+.site-loader__core-bolt {
+  width: 94px;
+  height: 94px;
+}
+
+.site-loader__core-bolt svg {
+  width: 47px;
+  height: 47px;
+}
+
+.site-loader__arc {
+  inset: 14px;
+}
+
+.site-loader__arc--two {
+  inset: 48px;
+}
+
+.site-loader__wire--live {
+  stroke-width: 3.6;
+  transition: stroke-dashoffset .72s cubic-bezier(.22,1,.36,1);
+}
+
+.site-loader.is-complete .site-loader__wire--live {
+  stroke-dashoffset: 0 !important;
+  transition: none !important;
+}
+
+.site-loader.is-complete .site-loader__branch {
+  stroke: rgba(244,183,0,.72);
+  filter: drop-shadow(0 0 5px rgba(244,183,0,.42));
+}
+
+.site-loader.is-complete .site-loader__schematic circle {
+  fill: var(--yellow) !important;
+  stroke: var(--yellow-soft) !important;
+  filter: drop-shadow(0 0 8px rgba(244,183,0,.82)) !important;
+}
+
+.site-loader.is-complete .site-loader__power::after {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(2.15);
+}
+
+.site-loader__meta {
+  max-width: 760px;
+  margin: 24px auto 0;
+  align-items: center;
+}
+
+.site-loader__meta > span {
+  padding-bottom: 0;
+  font-size: 9px;
+  letter-spacing: .22em;
+}
+
+.site-loader__meta strong {
+  font-size: 46px;
+}
+
+.site-loader__meta strong small {
+  font-size: 11px;
+}
+
+@media (max-width: 820px) {
+  .site-loader__content {
+    width: min(700px, calc(100vw - 30px));
+  }
+
+  .site-loader__power {
+    height: 282px;
+    margin-top: 28px;
+  }
+
+  .site-loader__power-core {
+    width: 158px;
+    height: 158px;
+  }
+
+  .site-loader__core-ring {
+    inset: 25px;
+  }
+
+  .site-loader__core-bolt {
+    width: 72px;
+    height: 72px;
+  }
+
+  .site-loader__core-bolt svg {
+    width: 36px;
+    height: 36px;
+  }
+
+  .site-loader__arc--two {
+    inset: 36px;
+  }
+
+  .site-loader__meta {
+    margin-top: 18px;
+  }
+
+  .site-loader__meta strong {
+    font-size: 38px;
+  }
+}
+
+@media (max-width: 520px) {
+  .site-loader__content {
+    width: calc(100vw - 20px);
+  }
+
+  .site-loader__power {
+    height: 248px;
+    margin-top: 18px;
+  }
+
+  .site-loader__power-core {
+    width: 138px;
+    height: 138px;
+  }
+
+  .site-loader__core-bolt {
+    width: 64px;
+    height: 64px;
+  }
+
+  .site-loader__core-bolt svg {
+    width: 32px;
+    height: 32px;
+  }
+
+  .site-loader__meta {
+    margin-top: 14px;
+  }
+
+  .site-loader__meta > span {
+    font-size: 7px;
+  }
+
+  .site-loader__meta strong {
+    font-size: 34px;
+  }
+}
