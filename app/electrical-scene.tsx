@@ -1059,6 +1059,7 @@ export default function ElectricalScene() {
       let pointerY = 0;
       let frame = 0;
       let lastRenderTime = 0;
+      let sceneReadySent = false;
 
       const easeProgress = (start: number, end: number, value: number) => {
         const x = THREE.MathUtils.clamp(
@@ -1468,6 +1469,12 @@ export default function ElectricalScene() {
 
         renderer.render(scene, camera);
 
+        if (!sceneReadySent) {
+          sceneReadySent = true;
+          document.documentElement.dataset.titanSceneReady = "true";
+          window.dispatchEvent(new CustomEvent("titan:scene-ready"));
+        }
+
         if (!reducedMotion.matches) {
           frame = window.requestAnimationFrame(render);
         }
@@ -1521,6 +1528,7 @@ export default function ElectricalScene() {
         }
         document.removeEventListener("visibilitychange", handleVisibility);
         reducedMotion.removeEventListener("change", handleReducedMotion);
+        delete document.documentElement.dataset.titanSceneReady;
 
         scrollTrigger.kill();
         introTween.kill();
