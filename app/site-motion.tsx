@@ -228,7 +228,7 @@ export default function SiteMotion() {
             : {
                 opacity: 0,
                 y: -20,
-                filter: "blur(8px)",
+                filter: mobile ? "blur(2px)" : "blur(4px)",
                 "--header-line-progress": 0,
               },
         );
@@ -247,7 +247,7 @@ export default function SiteMotion() {
             opacity: 0,
             y: mobile ? 24 : 44,
             clipPath: "inset(0 0 100% 0)",
-            filter: "blur(8px)",
+            filter: mobile ? "blur(3px)" : "blur(6px)",
           });
           gsap.set(heroText, {
             opacity: 0,
@@ -349,15 +349,15 @@ export default function SiteMotion() {
             filter: "drop-shadow(0 0 7px rgba(244,183,0,.72))",
             duration: 0.14,
           }, 0.42);
-          master.to(powerNodes[0], { attr: { r: 7 }, duration: 0.08, ease: "power2.out" }, 0.48);
-          master.to(powerNodes[0], { attr: { r: 5.8 }, duration: 0.12, ease: "power2.inOut" }, 0.56);
+          master.to(powerNodes[0], { attr: { r: 7 }, duration: 0.11, ease: "sine.out" }, 0.48);
+          master.to(powerNodes[0], { attr: { r: 5.8 }, duration: 0.14, ease: "sine.inOut" }, 0.56);
 
           // MAIN INPUT.
           master.set(liveWires[0], { opacity: 1 }, 0.5);
           master.to(liveWires[0], {
             strokeDashoffset: 0,
             duration: 0.42,
-            ease: "power1.inOut",
+            ease: "sine.inOut",
             onComplete: () => gsap.set(liveWires[0], { strokeDasharray: "none", strokeDashoffset: 0 }),
           }, 0.5);
           master.to(powerNodes[1], {
@@ -366,22 +366,22 @@ export default function SiteMotion() {
             filter: "drop-shadow(0 0 7px rgba(244,183,0,.72))",
             duration: 0.12,
           }, 0.88);
-          master.to(powerNodes[1], { attr: { r: 7 }, duration: 0.07 }, 0.9);
-          master.to(powerNodes[1], { attr: { r: 5.8 }, duration: 0.1 }, 0.97);
+          master.to(powerNodes[1], { attr: { r: 7 }, duration: 0.1, ease: "sine.out" }, 0.9);
+          master.to(powerNodes[1], { attr: { r: 5.8 }, duration: 0.12, ease: "sine.inOut" }, 0.97);
 
           // BREAKER / SUPPLY.
           master.set(liveWires[1], { opacity: 1 }, 0.94);
           master.to(liveWires[1], {
             strokeDashoffset: 0,
             duration: 0.46,
-            ease: "power1.inOut",
+            ease: "sine.inOut",
             onComplete: () => gsap.set(liveWires[1], { strokeDasharray: "none", strokeDashoffset: 0 }),
           }, 0.94);
           master.set(liveBranches[0], { opacity: 1 }, 1.15);
           master.to(liveBranches[0], {
             strokeDashoffset: 0,
             duration: 0.22,
-            ease: "power1.inOut",
+            ease: "sine.inOut",
             onComplete: () => gsap.set(liveBranches[0], { strokeDasharray: "none", strokeDashoffset: 0 }),
           }, 1.15);
           master.to(powerNodes[2], {
@@ -390,8 +390,8 @@ export default function SiteMotion() {
             filter: "drop-shadow(0 0 7px rgba(244,183,0,.72))",
             duration: 0.12,
           }, 1.34);
-          master.to(powerNodes[2], { attr: { r: 7 }, duration: 0.07 }, 1.36);
-          master.to(powerNodes[2], { attr: { r: 5.8 }, duration: 0.1 }, 1.43);
+          master.to(powerNodes[2], { attr: { r: 7 }, duration: 0.1, ease: "sine.out" }, 1.36);
+          master.to(powerNodes[2], { attr: { r: 5.8 }, duration: 0.12, ease: "sine.inOut" }, 1.43);
           master.to(stageCards[0], {
             color: "#dfe5ee",
             borderColor: "rgba(244,183,0,.26)",
@@ -410,14 +410,14 @@ export default function SiteMotion() {
           master.to(liveWires[2], {
             strokeDashoffset: 0,
             duration: 0.68,
-            ease: "power1.inOut",
+            ease: "sine.inOut",
             onComplete: () => gsap.set(liveWires[2], { strokeDasharray: "none", strokeDashoffset: 0 }),
           }, 1.44);
           master.set(liveBranches[1], { opacity: 1 }, 1.86);
           master.to(liveBranches[1], {
             strokeDashoffset: 0,
             duration: 0.24,
-            ease: "power1.inOut",
+            ease: "sine.inOut",
             onComplete: () => gsap.set(liveBranches[1], { strokeDasharray: "none", strokeDashoffset: 0 }),
           }, 1.86);
           master.to(powerNodes[3], {
@@ -426,8 +426,8 @@ export default function SiteMotion() {
             filter: "drop-shadow(0 0 8px rgba(244,183,0,.76))",
             duration: 0.13,
           }, 2.04);
-          master.to(powerNodes[3], { attr: { r: 7.1 }, duration: 0.07 }, 2.06);
-          master.to(powerNodes[3], { attr: { r: 5.8 }, duration: 0.11 }, 2.13);
+          master.to(powerNodes[3], { attr: { r: 7.1 }, duration: 0.1, ease: "sine.out" }, 2.06);
+          master.to(powerNodes[3], { attr: { r: 5.8 }, duration: 0.13, ease: "sine.inOut" }, 2.13);
           master.to(stageCards[1], {
             color: "#dfe5ee",
             borderColor: "rgba(244,183,0,.26)",
@@ -447,14 +447,14 @@ export default function SiteMotion() {
           master.to(liveWires[3], {
             strokeDashoffset: 0,
             duration: 0.58,
-            ease: "power1.inOut",
+            ease: "sine.inOut",
             onComplete: () => gsap.set(liveWires[3], { strokeDasharray: "none", strokeDashoffset: 0 }),
           }, 2.14);
           master.set(liveBranches[2], { opacity: 1 }, 2.46);
           master.to(liveBranches[2], {
             strokeDashoffset: 0,
             duration: 0.24,
-            ease: "power1.inOut",
+            ease: "sine.inOut",
             onComplete: () => gsap.set(liveBranches[2], { strokeDasharray: "none", strokeDashoffset: 0 }),
           }, 2.46);
           master.to(powerNodes[4], {
@@ -463,8 +463,8 @@ export default function SiteMotion() {
             filter: "drop-shadow(0 0 8px rgba(244,183,0,.8))",
             duration: 0.13,
           }, 2.64);
-          master.to(powerNodes[4], { attr: { r: 7.2 }, duration: 0.07 }, 2.66);
-          master.to(powerNodes[4], { attr: { r: 5.8 }, duration: 0.11 }, 2.73);
+          master.to(powerNodes[4], { attr: { r: 7.2 }, duration: 0.1, ease: "sine.out" }, 2.66);
+          master.to(powerNodes[4], { attr: { r: 5.8 }, duration: 0.13, ease: "sine.inOut" }, 2.73);
           master.to(stageCards[2], {
             color: "#dfe5ee",
             borderColor: "rgba(244,183,0,.26)",
@@ -482,7 +482,7 @@ export default function SiteMotion() {
           master.to(liveWires[4], {
             strokeDashoffset: 0,
             duration: 0.44,
-            ease: "power1.inOut",
+            ease: "sine.inOut",
             onComplete: () => gsap.set(liveWires[4], { strokeDasharray: "none", strokeDashoffset: 0 }),
           }, 2.74);
           master.to(powerNodes[5], {
@@ -491,8 +491,8 @@ export default function SiteMotion() {
             filter: "drop-shadow(0 0 9px rgba(244,183,0,.86))",
             duration: 0.12,
           }, 3.14);
-          master.to(powerNodes[5], { attr: { r: 7.4 }, duration: 0.07 }, 3.16);
-          master.to(powerNodes[5], { attr: { r: 5.8 }, duration: 0.11 }, 3.23);
+          master.to(powerNodes[5], { attr: { r: 7.4 }, duration: 0.1, ease: "sine.out" }, 3.16);
+          master.to(powerNodes[5], { attr: { r: 5.8 }, duration: 0.13, ease: "sine.inOut" }, 3.23);
 
           // Core reaches stable live state only after every wire/node is done.
           master.to(coreRing, {
@@ -637,6 +637,9 @@ export default function SiteMotion() {
           .timeline({
             paused: true,
             defaults: { ease: "power3.out" },
+            onStart: () => {
+              loader.style.pointerEvents = "none";
+            },
             onComplete: () => {
               loader.style.display = "none";
               loader.setAttribute("aria-hidden", "true");
@@ -644,29 +647,58 @@ export default function SiteMotion() {
               requestAnimationFrame(() => ScrollTrigger.refresh());
             },
           })
-          .to(scene, { opacity: 1, duration: 0.82, ease: "power2.out" }, 0.08)
+          .to(
+            scene,
+            {
+              opacity: 1,
+              duration: 1.18,
+              ease: "sine.out",
+            },
+            0.06,
+          )
           .to(
             loaderContent,
             {
               opacity: 0,
-              y: -8,
-              duration: 0.42,
-              ease: "power3.inOut",
+              y: -6,
+              scale: 0.992,
+              duration: 0.62,
+              ease: "sine.inOut",
+              force3D: true,
             },
-            0.02,
+            0,
           )
-          .to(topPanel, { yPercent: -102, duration: 1.08, ease: "expo.inOut" }, 0.22)
-          .to(bottomPanel, { yPercent: 102, duration: 1.08, ease: "expo.inOut" }, 0.22)
+          .to(
+            topPanel,
+            {
+              yPercent: -104,
+              duration: 1.38,
+              ease: "power4.inOut",
+              force3D: true,
+            },
+            0.2,
+          )
+          .to(
+            bottomPanel,
+            {
+              yPercent: 104,
+              duration: 1.38,
+              ease: "power4.inOut",
+              force3D: true,
+            },
+            0.2,
+          )
           .to(
             heroEyebrow,
             {
               opacity: 1,
               y: 0,
               filter: "blur(0px)",
-              duration: 0.52,
+              duration: 0.62,
+              ease: "power3.out",
               clearProps: "transform,filter,opacity",
             },
-            0.42,
+            0.62,
           )
           .to(
             heroHeading,
@@ -675,11 +707,11 @@ export default function SiteMotion() {
               y: 0,
               clipPath: "inset(0 0 0% 0)",
               filter: "blur(0px)",
-              duration: 0.82,
+              duration: 0.94,
               ease: "power4.out",
               clearProps: "transform,filter,opacity,clipPath",
             },
-            0.5,
+            0.7,
           )
           .to(
             heroText,
@@ -687,50 +719,55 @@ export default function SiteMotion() {
               opacity: 1,
               y: 0,
               filter: "blur(0px)",
-              duration: 0.6,
+              duration: 0.68,
+              ease: "power3.out",
               clearProps: "transform,filter,opacity",
             },
-            0.68,
+            0.9,
           )
           .to(
             heroActions,
             {
               opacity: 1,
               y: 0,
-              duration: 0.52,
+              duration: 0.58,
+              ease: "power3.out",
               clearProps: "transform,opacity",
             },
-            0.8,
+            1.02,
           )
           .to(
             heroDisciplines,
             {
               opacity: 1,
               y: 0,
-              duration: 0.5,
+              duration: 0.56,
+              ease: "power3.out",
               clearProps: "transform,opacity",
             },
-            0.9,
+            1.12,
           )
           .to(
             heroCue,
             {
               opacity: 1,
               y: 0,
-              duration: 0.4,
+              duration: 0.46,
+              ease: "power2.out",
               clearProps: "transform,opacity",
             },
-            0.98,
+            1.2,
           )
           .to(
             announcement,
             {
               opacity: 1,
               y: 0,
-              duration: 0.45,
+              duration: 0.52,
+              ease: "sine.out",
               clearProps: "transform,opacity",
             },
-            1.02,
+            1.18,
           )
           .to(
             header,
@@ -738,52 +775,56 @@ export default function SiteMotion() {
               opacity: 1,
               y: 0,
               filter: "blur(0px)",
-              duration: 0.55,
+              duration: 0.68,
+              ease: "power3.out",
               clearProps: "transform,filter,opacity",
             },
-            1.08,
+            1.26,
           )
           .to(
             headerBrand,
             {
               opacity: 1,
               y: 0,
-              duration: 0.42,
+              duration: 0.5,
+              ease: "power3.out",
               clearProps: "transform,opacity",
             },
-            1.16,
+            1.34,
           )
           .to(
             headerLinks,
             {
               opacity: 1,
               y: 0,
-              duration: 0.38,
-              stagger: 0.055,
+              duration: 0.46,
+              stagger: 0.065,
+              ease: "power3.out",
               clearProps: "transform,opacity",
             },
-            1.2,
+            1.4,
           )
           .to(
             headerButton,
             {
               opacity: 1,
               y: 0,
-              duration: 0.42,
+              duration: 0.5,
+              ease: "power3.out",
               clearProps: "transform,opacity",
             },
-            1.28,
+            1.5,
           )
           .to(
             header,
             {
               "--header-line-progress": 1,
-              duration: 0.58,
-              ease: "power2.out",
+              duration: 0.72,
+              ease: "sine.out",
             },
-            1.16,
+            1.34,
           )
-          .call(unlockScroll, undefined, 1.2);
+          .call(unlockScroll, undefined, 1.48);
 
       }, body);
 
