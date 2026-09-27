@@ -1,4 +1,5 @@
 import ElectricalScene from "./electrical-scene";
+import SiteMotion from "./site-motion";
 
 const serviceGroups = [
   {
@@ -69,6 +70,7 @@ function InstagramIcon() {
 export default function Home() {
   return (
     <>
+      <SiteMotion />
       <a className="skip-link" href="#glavni-sadrzaj">Preskoči na glavni sadržaj</a>
       <ElectricalScene />
 
@@ -107,16 +109,16 @@ export default function Home() {
         <section className="hero" id="top">
           <div className="hero__grid" aria-hidden="true" />
           <div className="hero__copy">
-            <p className="eyebrow"><span /> ELEKTROINSTALACIJE • CRNA GORA</p>
-            <h1>Snaga koja<br />ostaje <em>pod kontrolom.</em></h1>
-            <p className="hero__lead">
+            <p className="eyebrow" data-hero="eyebrow"><span /> ELEKTROINSTALACIJE • CRNA GORA</p>
+            <h1 data-hero="heading">Snaga koja<br />ostaje <em>pod kontrolom.</em></h1>
+            <p className="hero__lead" data-hero="text">
               Kompletne elektroinstalacije za domove i poslovne objekte — od razvoda i rasvjete do automatike.
             </p>
-            <div className="hero__actions">
+            <div className="hero__actions" data-hero="actions">
               <a className="button" href="tel:+38267152154">Pozovite Titan <ArrowIcon /></a>
               <a className="text-link" href="#usluge">Istražite sistem <span aria-hidden="true">↓</span></a>
             </div>
-            <div className="hero__disciplines" aria-label="Oblasti rada">
+            <div className="hero__disciplines" data-hero="disciplines" aria-label="Oblasti rada">
               <span>JAKA STRUJA</span><span>SLABA STRUJA</span><span>AUTOMATIKA</span>
             </div>
           </div>
@@ -129,17 +131,17 @@ export default function Home() {
             </div>
             </aside>
 
-          <div className="hero__scroll-cue" aria-hidden="true"><span>SKROLUJ</span><i /></div>
+          <div className="hero__scroll-cue" data-hero="cue" aria-hidden="true"><span>SKROLUJ</span><i /></div>
         </section>
 
         <section className="services section section--glass" id="usluge">
-          <div className="section-kicker"><p>USLUGE</p></div>
+          <div className="section-kicker" data-reveal="kicker"><p>USLUGE</p></div>
           <div className="section-heading">
-            <h2>Jedan tim.<br /><em>Cijeli sistem.</em></h2>
-            <p>Od grubih instalacija do završne montaže, jedan tim vodi cijeli sistem.</p>
+            <h2 data-reveal="heading">Jedan tim.<br /><em>Cijeli sistem.</em></h2>
+            <p data-reveal="text">Od grubih instalacija do završne montaže, jedan tim vodi cijeli sistem.</p>
           </div>
 
-          <div className="service-grid">
+          <div className="service-grid" data-reveal="stagger">
             {serviceGroups.map((group) => (
               <article className="service-card" key={group.title}>
                 <div className="service-card__head"><ArrowIcon /></div>
@@ -155,15 +157,15 @@ export default function Home() {
 
         <section className="system section" id="sistem">
           <div className="system__copy">
-            <div className="section-kicker"><p>PRINCIP</p></div>
-            <h2>Instalacija nije<br />samo kabl.<br /><em>To je sistem.</em></h2>
-            <p>
+            <div className="section-kicker" data-reveal="kicker"><p>PRINCIP</p></div>
+            <h2 data-reveal="heading">Instalacija nije<br />samo kabl.<br /><em>To je sistem.</em></h2>
+            <p data-reveal="text">
               Uredna trasa, pravilna zaštita i jasna raspodjela — sistem mora imati logiku od početka do završne obrade.
             </p>
-            <a className="text-link" href="#proces">Kako radimo <ArrowIcon /></a>
+            <a className="text-link" data-reveal="text" href="#proces">Kako radimo <ArrowIcon /></a>
           </div>
 
-          <div className="system__matrix" aria-label="Tri principa rada">
+          <div className="system__matrix" data-reveal="stagger" aria-label="Tri principa rada">
             <article><span>PLAN</span><strong>Jasna trasa</strong><p>Prvo definišemo šta ide gdje i zašto.</p></article>
             <article><span>ZAŠTITA</span><strong>Siguran razvod</strong><p>Svaka linija dobija svoje mjesto i odgovarajuću zaštitu.</p></article>
             <article><span>FINIŠ</span><strong>Čista izvedba</strong><p>Završni detalji moraju biti precizni koliko i instalacija iza zida.</p></article>
@@ -171,11 +173,12 @@ export default function Home() {
         </section>
 
         <section className="work work--transparent section" id="radovi">
-          <div className="section-kicker"><p>RADOVI</p></div>
+          <div className="section-kicker" data-reveal="kicker"><p>RADOVI</p></div>
           <div className="section-heading work__heading">
-            <h2>Rezultat se vidi.<br /><em>Standard ostaje.</em></h2>
+            <h2 data-reveal="heading">Rezultat se vidi.<br /><em>Standard ostaje.</em></h2>
             <a
               className="work__instagram"
+              data-reveal="text"
               href="https://www.instagram.com/elektroinstalacije_titan/"
               target="_blank"
               rel="noreferrer"
@@ -187,7 +190,7 @@ export default function Home() {
             </a>
           </div>
 
-          <div className="work-strip work-strip--transparent">
+          <div className="work-strip work-strip--transparent" data-reveal="stagger">
             <article className="work-panel work-panel--wide">
               <div className="work-panel__meta"><i /><span>TABLA / ZAŠTITA</span></div>
               <strong>RAZVOD</strong>
@@ -213,11 +216,11 @@ export default function Home() {
 
         <section className="process section" id="proces">
           <div className="process__heading">
-            <div className="section-kicker"><p>PROCES</p></div>
-            <h2>Od poziva do<br /><em>uključenja.</em></h2>
-            <p>Jasno definišemo posao, termin i svaki sljedeći korak.</p>
+            <div className="section-kicker" data-reveal="kicker"><p>PROCES</p></div>
+            <h2 data-reveal="heading">Od poziva do<br /><em>uključenja.</em></h2>
+            <p data-reveal="text">Jasno definišemo posao, termin i svaki sljedeći korak.</p>
           </div>
-          <div className="process__steps">
+          <div className="process__steps" data-reveal="stagger">
             {process.map(([title, text]) => (
               <article key={title}>
                 <h3>{title}</h3>
@@ -230,7 +233,7 @@ export default function Home() {
 
         <section className="contact" id="kontakt">
           <div className="contact__noise" aria-hidden="true" />
-          <div className="contact__content">
+          <div className="contact__content" data-reveal="stagger">
             <div className="section-kicker section-kicker--dark"><p>KONTAKT</p></div>
             <h2>Imate projekat?<br /><em>Uključimo ga.</em></h2>
             <p>Opišite projekat. Javljamo se radi dogovora i procjene radova.</p>
@@ -238,7 +241,7 @@ export default function Home() {
               <small>POZOVITE NAS</small><strong>067 152 154</strong><ArrowIcon />
             </a>
           </div>
-          <div className="contact__details">
+          <div className="contact__details" data-reveal="stagger">
             <div><span>INSTAGRAM</span><a href="https://www.instagram.com/elektroinstalacije_titan/" target="_blank" rel="noreferrer">@elektroinstalacije_titan</a></div>
             <div><span>SERVISNA ZONA</span><strong>CRNA GORA</strong></div>
             <div><span>USLUGE</span><strong>JAKA • SLABA • AUTOMATIKA</strong></div>
@@ -247,7 +250,7 @@ export default function Home() {
         </section>
       </main>
 
-      <footer>
+      <footer data-reveal="stagger">
         <a className="brand brand--footer" href="#top" aria-label="Titan početna">
           <span className="brand__mark"><BoltMark /></span>
           <span className="brand__text"><strong>TITAN</strong><small>ELEKTROINSTALACIJE</small></span>
