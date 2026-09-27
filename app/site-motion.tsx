@@ -45,6 +45,11 @@ export default function SiteMotion() {
       const scene = document.querySelector<HTMLElement>(".three-scene--plc");
       const announcement = document.querySelector<HTMLElement>(".announcement");
       const header = document.querySelector<HTMLElement>(".site-header");
+      const headerBrand = header?.querySelector<HTMLElement>(".brand");
+      const headerButton = header?.querySelector<HTMLElement>(".button");
+      const headerLinks = header
+        ? Array.from(header.querySelectorAll<HTMLElement>("nav a"))
+        : [];
 
       const heroEyebrow = document.querySelector<HTMLElement>('[data-hero="eyebrow"]');
       const heroHeading = document.querySelector<HTMLElement>('[data-hero="heading"]');
@@ -53,75 +58,42 @@ export default function SiteMotion() {
       const heroDisciplines = document.querySelector<HTMLElement>('[data-hero="disciplines"]');
       const heroCue = document.querySelector<HTMLElement>('[data-hero="cue"]');
 
-      const progressValue = loader.querySelector<HTMLElement>("[data-loader-progress]");
-      const loaderStatus = loader.querySelector<HTMLElement>("[data-loader-status]");
       const loaderBrand = loader.querySelector<HTMLElement>(".site-loader__brand");
-      const loaderMeta = loader.querySelector<HTMLElement>(".site-loader__meta");
       const loaderContent = loader.querySelector<HTMLElement>(".site-loader__content");
-      const loaderPower = loader.querySelector<HTMLElement>(".site-loader__power");
-      const coreRing = loader.querySelector<HTMLElement>(".site-loader__core-ring");
+      const loaderStatus = loader.querySelector<HTMLElement>("[data-loader-status]");
+      const progressValue = loader.querySelector<HTMLElement>("[data-loader-progress]");
+      const leftCharge = loader.querySelector<HTMLElement>(".site-loader__charge--left");
+      const rightCharge = loader.querySelector<HTMLElement>(".site-loader__charge--right");
+      const signal = loader.querySelector<HTMLElement>(".site-loader__signal");
+      const core = loader.querySelector<HTMLElement>(".site-loader__core");
       const coreBolt = loader.querySelector<HTMLElement>(".site-loader__core-bolt");
       const topPanel = loader.querySelector<HTMLElement>(".site-loader__panel--top");
       const bottomPanel = loader.querySelector<HTMLElement>(".site-loader__panel--bottom");
-
-      const liveWires = Array.from(
-        loader.querySelectorAll<SVGPathElement>("[data-power-wire]"),
-      );
-      const liveBranches = Array.from(
-        loader.querySelectorAll<SVGPathElement>("[data-power-branch]"),
-      );
-      const powerNodes = Array.from(
-        loader.querySelectorAll<SVGCircleElement>("[data-power-node]"),
-      );
-      const stageCards = Array.from(
-        loader.querySelectorAll<HTMLElement>("[data-power-stage-card]"),
-      );
 
       if (
         !scene ||
         !announcement ||
         !header ||
+        !headerBrand ||
+        !headerButton ||
         !heroEyebrow ||
         !heroHeading ||
         !heroText ||
         !heroActions ||
         !heroDisciplines ||
         !heroCue ||
-        !progressValue ||
-        !loaderStatus ||
         !loaderBrand ||
-        !loaderMeta ||
         !loaderContent ||
-        !loaderPower ||
-        !coreRing ||
+        !loaderStatus ||
+        !progressValue ||
+        !leftCharge ||
+        !rightCharge ||
+        !signal ||
+        !core ||
         !coreBolt ||
         !topPanel ||
-        !bottomPanel ||
-        liveWires.length !== 5 ||
-        liveBranches.length !== 3 ||
-        powerNodes.length !== 6 ||
-        stageCards.length !== 3
+        !bottomPanel
       ) {
-        unlockScroll();
-        loader.style.display = "none";
-        return;
-      }
-
-      const headerBrand = header.querySelector<HTMLElement>(".brand");
-      const headerButton = header.querySelector<HTMLElement>(".button");
-      const headerLinks = Array.from(header.querySelectorAll<HTMLElement>("nav a"));
-
-      if (!headerBrand || !headerButton) {
-        unlockScroll();
-        loader.style.display = "none";
-        return;
-      }
-
-      const stageLeds = stageCards.map((card) =>
-        card.querySelector<HTMLElement>(".site-loader__stage-led"),
-      );
-
-      if (stageLeds.some((led) => !led)) {
         unlockScroll();
         loader.style.display = "none";
         return;
@@ -130,395 +102,146 @@ export default function SiteMotion() {
       const progress = { value: 0 };
       const renderProgress = () => {
         const value = Math.min(100, Math.max(0, progress.value));
-        const displayValue = value >= 99.95 ? 100 : Math.floor(value);
-        progressValue.textContent = String(displayValue).padStart(2, "0");
-      };
-
-      const setStatus = (text: string) => {
-        loaderStatus.textContent = text;
-      };
-
-      const wireLengths = [...liveWires, ...liveBranches].map((path) => path.getTotalLength());
-
-      const setWireOff = (path: SVGPathElement, length: number) => {
-        gsap.set(path, {
-          strokeDasharray: length,
-          strokeDashoffset: length,
-          opacity: 0,
-        });
-      };
-
-      const setNodeOn = (node: SVGCircleElement) => {
-        gsap.set(node, {
-          attr: { r: 5.8 },
-          fill: "#f4b700",
-          stroke: "#ffe48a",
-          filter: "drop-shadow(0 0 8px rgba(244,183,0,.82))",
-        });
-      };
-
-      const setCompleteLoaderState = () => {
-        liveWires.forEach((path) => {
-          gsap.set(path, {
-            strokeDasharray: "none",
-            strokeDashoffset: 0,
-            opacity: 1,
-          });
-        });
-
-        liveBranches.forEach((path) => {
-          gsap.set(path, {
-            strokeDasharray: "none",
-            strokeDashoffset: 0,
-            opacity: 1,
-          });
-        });
-
-        powerNodes.forEach(setNodeOn);
-
-        stageCards.forEach((card, index) => {
-          gsap.set(card, {
-            color: "#dfe5ee",
-            borderColor: "rgba(244,183,0,.28)",
-            backgroundColor: "rgba(244,183,0,.05)",
-          });
-          gsap.set(stageLeds[index], {
-            backgroundColor: "#f4b700",
-            boxShadow: "0 0 11px rgba(244,183,0,.78)",
-          });
-        });
-
-        gsap.set(coreRing, {
-          borderColor: "rgba(255,235,166,.92)",
-          boxShadow:
-            "inset 0 0 52px rgba(244,183,0,.14), 0 0 62px rgba(244,183,0,.24)",
-          scale: 1.08,
-        });
-        gsap.set(coreBolt, {
-          color: "#080b12",
-          backgroundColor: "#f4b700",
-          boxShadow:
-            "0 0 20px rgba(244,183,0,.7), 0 0 52px rgba(244,183,0,.32)",
-          scale: 1.08,
-        });
-        gsap.set(loaderPower, {
-          "--loader-core-glow": 1,
-        });
-
-        progress.value = 100;
-        renderProgress();
-        setStatus("SISTEM POD NAPONOM");
-        loader.classList.add("is-complete");
+        progressValue.textContent = String(Math.round(value)).padStart(2, "0");
       };
 
       let loaderTimeline: any = null;
       let entranceTimeline: any = null;
-      let resolveLoaderTimeline = () => {};
-      const loaderTimelineFinished = new Promise<void>((resolve) => {
-        resolveLoaderTimeline = resolve;
+      let resolveLoader = () => {};
+      const loaderFinished = new Promise<void>((resolve) => {
+        resolveLoader = resolve;
       });
 
       const context = gsap.context(() => {
-        gsap.set(scene, { opacity: reducedMotion ? 1 : 0 });
-        gsap.set(announcement, reducedMotion ? { clearProps: "all" } : { opacity: 0, y: -10 });
-        gsap.set(
-          header,
-          reducedMotion
-            ? { clearProps: "all" }
-            : {
-                opacity: 0,
-                y: -20,
-                filter: mobile ? "blur(2px)" : "blur(4px)",
-                "--header-line-progress": 0,
-              },
-        );
-
+        // Page entrance initial state: transform/opacity only.
         if (!reducedMotion) {
-          gsap.set([headerBrand, ...headerLinks, headerButton], {
-            opacity: 0,
-            y: -8,
-          });
-          gsap.set(heroEyebrow, {
-            opacity: 0,
-            y: mobile ? 12 : 18,
-            filter: "blur(5px)",
-          });
-          gsap.set(heroHeading, {
-            opacity: 0,
-            y: mobile ? 24 : 44,
-            clipPath: "inset(0 0 100% 0)",
-            filter: mobile ? "blur(3px)" : "blur(6px)",
-          });
-          gsap.set(heroText, {
-            opacity: 0,
-            y: mobile ? 14 : 24,
-            filter: "blur(5px)",
-          });
-          gsap.set(heroActions, { opacity: 0, y: mobile ? 12 : 20 });
-          gsap.set(heroDisciplines, { opacity: 0, y: mobile ? 10 : 16 });
-          gsap.set(heroCue, { opacity: 0, y: 10 });
+          gsap.set(scene, { opacity: 0 });
+          gsap.set(announcement, { opacity: 0, y: -8 });
+          gsap.set(header, { opacity: 0, y: -16, "--header-line-progress": 0 });
+          gsap.set([headerBrand, ...headerLinks, headerButton], { opacity: 0, y: -8 });
+
+          gsap.set(heroEyebrow, { opacity: 0, y: mobile ? 10 : 14 });
+          gsap.set(heroHeading, { opacity: 0, y: mobile ? 20 : 30 });
+          gsap.set(heroText, { opacity: 0, y: mobile ? 12 : 18 });
+          gsap.set(heroActions, { opacity: 0, y: mobile ? 10 : 16 });
+          gsap.set(heroDisciplines, { opacity: 0, y: mobile ? 8 : 12 });
+          gsap.set(heroCue, { opacity: 0, y: 8 });
         }
 
-        // Absolute loader first-frame state.
-        loader.classList.remove("is-complete");
+        // Loader true first frame.
         progress.value = 0;
         renderProgress();
-        setStatus("PROVJERA INSTALACIJE");
+        loaderStatus.textContent = "NAPAJANJE SISTEMA";
 
-        gsap.set(loaderBrand, {
-          opacity: reducedMotion ? 1 : 0,
-          y: reducedMotion ? 0 : 12,
-        });
-        gsap.set(loaderMeta, {
-          opacity: 1,
-          y: 0,
-        });
-
-        liveWires.forEach((path, index) => setWireOff(path, wireLengths[index]));
-        liveBranches.forEach((path, index) =>
-          setWireOff(path, wireLengths[liveWires.length + index]),
-        );
-
-        gsap.set(powerNodes, {
-          attr: { r: 5.8 },
-          fill: "#070b14",
-          stroke: "rgba(255,255,255,.28)",
-          filter: "none",
-        });
-
-        gsap.set(stageCards, {
-          color: "rgba(207,215,226,.42)",
-          borderColor: "rgba(255,255,255,.07)",
-          backgroundColor: "rgba(4,8,15,.28)",
-        });
-        gsap.set(stageLeds, {
-          backgroundColor: "rgba(255,255,255,.15)",
-          boxShadow: "none",
-        });
-
-        gsap.set(coreRing, {
-          borderColor: "rgba(244,183,0,.24)",
-          boxShadow:
-            "inset 0 0 24px rgba(244,183,0,.025), 0 0 20px rgba(244,183,0,.025)",
-          scale: 0.98,
-        });
-        gsap.set(coreBolt, {
-          color: "#3a310e",
-          backgroundColor: "rgba(244,183,0,.06)",
-          boxShadow: "0 0 0 rgba(244,183,0,0)",
-          scale: 0.96,
-        });
-        gsap.set(loaderPower, {
-          "--loader-core-glow": 0,
-        });
+        gsap.set(loaderBrand, { opacity: reducedMotion ? 1 : 0, y: reducedMotion ? 0 : 10 });
+        gsap.set(leftCharge, { scaleX: 0, transformOrigin: "left center" });
+        gsap.set(rightCharge, { scaleX: 0, transformOrigin: "left center" });
+        gsap.set(signal, { opacity: 0, xPercent: 0 });
+        gsap.set(core, { scale: 0.96 });
+        gsap.set(coreBolt, { opacity: 0.35, scale: 0.92 });
 
         if (reducedMotion) {
-          setCompleteLoaderState();
-          resolveLoaderTimeline();
+          progress.value = 100;
+          renderProgress();
+          loaderStatus.textContent = "SISTEM SPREMAN";
+          gsap.set(loaderBrand, { opacity: 1, y: 0 });
+          gsap.set([leftCharge, rightCharge], { scaleX: 1 });
+          gsap.set(signal, { opacity: 0 });
+          gsap.set(core, { scale: 1 });
+          gsap.set(coreBolt, { opacity: 1, scale: 1 });
+          resolveLoader();
         } else {
           const master = gsap.timeline({
             paused: true,
-            defaults: { ease: "sine.inOut" },
-            onComplete: resolveLoaderTimeline,
+            onComplete: resolveLoader,
           });
 
-          // Percentage is part of this same master timeline. It deliberately
-          // stops at 99 until the final output node is fully energized.
-          master.to(
-            progress,
-            {
-              value: 99,
-              duration: 2.95,
-              ease: "none",
-              onUpdate: renderProgress,
-            },
-            0.4,
-          );
+          master.to(progress, {
+            value: 100,
+            duration: 3.25,
+            ease: "none",
+            onUpdate: renderProgress,
+          }, 0.35);
 
-          master.to(loaderBrand, { opacity: 1, y: 0, duration: 0.34, ease: "power2.out" }, 0.2);
-
-          master.call(() => setStatus("MREŽA 230V PRISUTNA"), [], 0.4);
-          master.to(coreRing, { borderColor: "rgba(244,183,0,.42)", scale: 1, duration: 0.35 }, 0.4);
-          master.to(coreBolt, { color: "#b58b08", backgroundColor: "rgba(244,183,0,.1)", scale: 1, duration: 0.35 }, 0.4);
-          master.to(loaderPower, { "--loader-core-glow": 0.18, duration: 0.45 }, 0.4);
-
-          // Source node.
-          master.to(powerNodes[0], {
-            fill: "#f4b700",
-            stroke: "#ffe48a",
-            filter: "drop-shadow(0 0 7px rgba(244,183,0,.72))",
-            duration: 0.14,
-          }, 0.42);
-          master.to(powerNodes[0], { attr: { r: 7 }, duration: 0.11, ease: "sine.out" }, 0.48);
-          master.to(powerNodes[0], { attr: { r: 5.8 }, duration: 0.14, ease: "sine.inOut" }, 0.56);
-
-          // MAIN INPUT.
-          master.set(liveWires[0], { opacity: 1 }, 0.5);
-          master.to(liveWires[0], {
-            strokeDashoffset: 0,
+          master.to(loaderBrand, {
+            opacity: 1,
+            y: 0,
             duration: 0.42,
-            ease: "sine.inOut",
-            onComplete: () => gsap.set(liveWires[0], { strokeDasharray: "none", strokeDashoffset: 0 }),
-          }, 0.5);
-          master.to(powerNodes[1], {
-            fill: "#f4b700",
-            stroke: "#ffe48a",
-            filter: "drop-shadow(0 0 7px rgba(244,183,0,.72))",
-            duration: 0.12,
-          }, 0.88);
-          master.to(powerNodes[1], { attr: { r: 7 }, duration: 0.1, ease: "sine.out" }, 0.9);
-          master.to(powerNodes[1], { attr: { r: 5.8 }, duration: 0.12, ease: "sine.inOut" }, 0.97);
-
-          // BREAKER / SUPPLY.
-          master.set(liveWires[1], { opacity: 1 }, 0.94);
-          master.to(liveWires[1], {
-            strokeDashoffset: 0,
-            duration: 0.46,
-            ease: "sine.inOut",
-            onComplete: () => gsap.set(liveWires[1], { strokeDasharray: "none", strokeDashoffset: 0 }),
-          }, 0.94);
-          master.set(liveBranches[0], { opacity: 1 }, 1.15);
-          master.to(liveBranches[0], {
-            strokeDashoffset: 0,
-            duration: 0.22,
-            ease: "sine.inOut",
-            onComplete: () => gsap.set(liveBranches[0], { strokeDasharray: "none", strokeDashoffset: 0 }),
-          }, 1.15);
-          master.to(powerNodes[2], {
-            fill: "#f4b700",
-            stroke: "#ffe48a",
-            filter: "drop-shadow(0 0 7px rgba(244,183,0,.72))",
-            duration: 0.12,
-          }, 1.34);
-          master.to(powerNodes[2], { attr: { r: 7 }, duration: 0.1, ease: "sine.out" }, 1.36);
-          master.to(powerNodes[2], { attr: { r: 5.8 }, duration: 0.12, ease: "sine.inOut" }, 1.43);
-          master.to(stageCards[0], {
-            color: "#dfe5ee",
-            borderColor: "rgba(244,183,0,.26)",
-            backgroundColor: "rgba(244,183,0,.045)",
-            duration: 0.28,
-          }, 1.25);
-          master.to(stageLeds[0], {
-            backgroundColor: "#f4b700",
-            boxShadow: "0 0 10px rgba(244,183,0,.74)",
-            duration: 0.2,
-          }, 1.25);
-
-          // 24V CONTROL BUS.
-          master.call(() => setStatus("KONTROLNI BUS 24V"), [], 1.42);
-          master.set(liveWires[2], { opacity: 1 }, 1.44);
-          master.to(liveWires[2], {
-            strokeDashoffset: 0,
-            duration: 0.68,
-            ease: "sine.inOut",
-            onComplete: () => gsap.set(liveWires[2], { strokeDasharray: "none", strokeDashoffset: 0 }),
-          }, 1.44);
-          master.set(liveBranches[1], { opacity: 1 }, 1.86);
-          master.to(liveBranches[1], {
-            strokeDashoffset: 0,
-            duration: 0.24,
-            ease: "sine.inOut",
-            onComplete: () => gsap.set(liveBranches[1], { strokeDasharray: "none", strokeDashoffset: 0 }),
-          }, 1.86);
-          master.to(powerNodes[3], {
-            fill: "#f4b700",
-            stroke: "#ffe48a",
-            filter: "drop-shadow(0 0 8px rgba(244,183,0,.76))",
-            duration: 0.13,
-          }, 2.04);
-          master.to(powerNodes[3], { attr: { r: 7.1 }, duration: 0.1, ease: "sine.out" }, 2.06);
-          master.to(powerNodes[3], { attr: { r: 5.8 }, duration: 0.13, ease: "sine.inOut" }, 2.13);
-          master.to(stageCards[1], {
-            color: "#dfe5ee",
-            borderColor: "rgba(244,183,0,.26)",
-            backgroundColor: "rgba(244,183,0,.045)",
-            duration: 0.28,
-          }, 1.9);
-          master.to(stageLeds[1], {
-            backgroundColor: "#f4b700",
-            boxShadow: "0 0 10px rgba(244,183,0,.74)",
-            duration: 0.2,
-          }, 1.9);
-          master.to(loaderPower, { "--loader-core-glow": 0.46, duration: 0.42 }, 1.82);
-
-          // PLC.
-          master.call(() => setStatus("PLC / I-O ONLINE"), [], 2.12);
-          master.set(liveWires[3], { opacity: 1 }, 2.14);
-          master.to(liveWires[3], {
-            strokeDashoffset: 0,
-            duration: 0.58,
-            ease: "sine.inOut",
-            onComplete: () => gsap.set(liveWires[3], { strokeDasharray: "none", strokeDashoffset: 0 }),
-          }, 2.14);
-          master.set(liveBranches[2], { opacity: 1 }, 2.46);
-          master.to(liveBranches[2], {
-            strokeDashoffset: 0,
-            duration: 0.24,
-            ease: "sine.inOut",
-            onComplete: () => gsap.set(liveBranches[2], { strokeDasharray: "none", strokeDashoffset: 0 }),
-          }, 2.46);
-          master.to(powerNodes[4], {
-            fill: "#f4b700",
-            stroke: "#ffe48a",
-            filter: "drop-shadow(0 0 8px rgba(244,183,0,.8))",
-            duration: 0.13,
-          }, 2.64);
-          master.to(powerNodes[4], { attr: { r: 7.2 }, duration: 0.1, ease: "sine.out" }, 2.66);
-          master.to(powerNodes[4], { attr: { r: 5.8 }, duration: 0.13, ease: "sine.inOut" }, 2.73);
-          master.to(stageCards[2], {
-            color: "#dfe5ee",
-            borderColor: "rgba(244,183,0,.26)",
-            backgroundColor: "rgba(244,183,0,.045)",
-            duration: 0.28,
-          }, 2.45);
-          master.to(stageLeds[2], {
-            backgroundColor: "#f4b700",
-            boxShadow: "0 0 10px rgba(244,183,0,.74)",
-            duration: 0.2,
-          }, 2.45);
-
-          // OUTPUT — the very last primary circuit segment.
-          master.set(liveWires[4], { opacity: 1 }, 2.74);
-          master.to(liveWires[4], {
-            strokeDashoffset: 0,
-            duration: 0.44,
-            ease: "sine.inOut",
-            onComplete: () => gsap.set(liveWires[4], { strokeDasharray: "none", strokeDashoffset: 0 }),
-          }, 2.74);
-          master.to(powerNodes[5], {
-            fill: "#f4b700",
-            stroke: "#ffe48a",
-            filter: "drop-shadow(0 0 9px rgba(244,183,0,.86))",
-            duration: 0.12,
-          }, 3.14);
-          master.to(powerNodes[5], { attr: { r: 7.4 }, duration: 0.1, ease: "sine.out" }, 3.16);
-          master.to(powerNodes[5], { attr: { r: 5.8 }, duration: 0.13, ease: "sine.inOut" }, 3.23);
-
-          // Core reaches stable live state only after every wire/node is done.
-          master.to(coreRing, {
-            borderColor: "rgba(255,235,166,.92)",
-            boxShadow:
-              "inset 0 0 52px rgba(244,183,0,.14), 0 0 62px rgba(244,183,0,.24)",
-            scale: 1.08,
-            duration: 0.26,
             ease: "power2.out",
-          }, 3.12);
+          }, 0.12);
+
+          master.to(signal, {
+            opacity: 1,
+            duration: 0.18,
+            ease: "none",
+          }, 0.44);
+
+          master.to(leftCharge, {
+            scaleX: 1,
+            duration: 1.24,
+            ease: "sine.inOut",
+          }, 0.46);
+
+          master.to(signal, {
+            xPercent: 455,
+            duration: 1.24,
+            ease: "sine.inOut",
+          }, 0.46);
+
+          master.to(core, {
+            scale: 1.035,
+            duration: 0.28,
+            ease: "power2.out",
+          }, 1.58);
+
           master.to(coreBolt, {
-            color: "#080b12",
-            backgroundColor: "#f4b700",
-            boxShadow:
-              "0 0 20px rgba(244,183,0,.7), 0 0 52px rgba(244,183,0,.32)",
-            scale: 1.08,
-            duration: 0.26,
+            opacity: 1,
+            scale: 1.04,
+            duration: 0.34,
             ease: "power2.out",
-          }, 3.12);
-          master.to(loaderPower, { "--loader-core-glow": 1, duration: 0.28 }, 3.12);
+          }, 1.58);
 
           master.call(() => {
-            setCompleteLoaderState();
-          }, [], 3.35);
+            loaderStatus.textContent = "TOK USPOSTAVLJEN";
+          }, [], 1.72);
 
-          // Explicit completed-state hold. Nothing electrical is still animating here.
+          master.to(rightCharge, {
+            scaleX: 1,
+            duration: 1.34,
+            ease: "sine.inOut",
+          }, 1.86);
+
+          master.to(signal, {
+            xPercent: 920,
+            duration: 1.34,
+            ease: "sine.inOut",
+          }, 1.86);
+
+          master.to(core, {
+            scale: 1,
+            duration: 0.28,
+            ease: "sine.inOut",
+          }, 2.08);
+
+          master.to(coreBolt, {
+            scale: 1,
+            duration: 0.28,
+            ease: "sine.inOut",
+          }, 2.08);
+
+          master.call(() => {
+            progress.value = 100;
+            renderProgress();
+            loaderStatus.textContent = "SISTEM SPREMAN";
+          }, [], 3.3);
+
+          master.to(signal, {
+            opacity: 0,
+            duration: 0.24,
+            ease: "sine.out",
+          }, 3.34);
+
+          // Clean completed-state hold; total loader is 4 seconds.
           master.call(() => {}, [], 4.0);
 
           loaderTimeline = master;
@@ -531,7 +254,7 @@ export default function SiteMotion() {
 
         revealElements.forEach((element) => {
           const type = element.dataset.reveal;
-          const start = mobile ? "top 90%" : "top 86%";
+          const start = mobile ? "top 91%" : "top 87%";
 
           if (type === "stagger") {
             const children = Array.from(element.children).filter(
@@ -540,24 +263,15 @@ export default function SiteMotion() {
 
             gsap.fromTo(
               children,
-              {
-                opacity: 0,
-                y: mobile ? 14 : 26,
-                filter: mobile ? "blur(2px)" : "blur(4px)",
-              },
+              { opacity: 0, y: mobile ? 12 : 20 },
               {
                 opacity: 1,
                 y: 0,
-                filter: "blur(0px)",
-                duration: mobile ? 0.58 : 0.72,
-                stagger: mobile ? 0.06 : 0.09,
+                duration: mobile ? 0.52 : 0.66,
+                stagger: mobile ? 0.05 : 0.075,
                 ease: "power3.out",
-                clearProps: "transform,filter,opacity",
-                scrollTrigger: {
-                  trigger: element,
-                  start,
-                  once: true,
-                },
+                clearProps: "transform,opacity",
+                scrollTrigger: { trigger: element, start, once: true },
               },
             );
             return;
@@ -566,25 +280,14 @@ export default function SiteMotion() {
           if (type === "heading") {
             gsap.fromTo(
               element,
-              {
-                opacity: 0,
-                y: mobile ? 22 : 38,
-                clipPath: "inset(0 0 100% 0)",
-                filter: mobile ? "blur(3px)" : "blur(6px)",
-              },
+              { opacity: 0, y: mobile ? 20 : 30 },
               {
                 opacity: 1,
                 y: 0,
-                clipPath: "inset(0 0 0% 0)",
-                filter: "blur(0px)",
-                duration: mobile ? 0.7 : 0.9,
+                duration: mobile ? 0.64 : 0.8,
                 ease: "power4.out",
-                clearProps: "transform,filter,opacity,clipPath",
-                scrollTrigger: {
-                  trigger: element,
-                  start,
-                  once: true,
-                },
+                clearProps: "transform,opacity",
+                scrollTrigger: { trigger: element, start, once: true },
               },
             );
             return;
@@ -593,16 +296,16 @@ export default function SiteMotion() {
           if (type === "kicker") {
             gsap.fromTo(
               element,
-              { opacity: 0, x: mobile ? -10 : -18 },
+              { opacity: 0, x: mobile ? -8 : -14 },
               {
                 opacity: 1,
                 x: 0,
-                duration: 0.55,
+                duration: 0.48,
                 ease: "power3.out",
                 clearProps: "transform,opacity",
                 scrollTrigger: {
                   trigger: element,
-                  start: mobile ? "top 92%" : "top 88%",
+                  start: mobile ? "top 93%" : "top 89%",
                   once: true,
                 },
               },
@@ -612,220 +315,142 @@ export default function SiteMotion() {
 
           gsap.fromTo(
             element,
-            {
-              opacity: 0,
-              y: mobile ? 12 : 22,
-              filter: mobile ? "blur(2px)" : "blur(4px)",
-            },
+            { opacity: 0, y: mobile ? 10 : 16 },
             {
               opacity: 1,
               y: 0,
-              filter: "blur(0px)",
-              duration: mobile ? 0.58 : 0.72,
+              duration: mobile ? 0.52 : 0.64,
               ease: "power3.out",
-              clearProps: "transform,filter,opacity",
-              scrollTrigger: {
-                trigger: element,
-                start,
-                once: true,
-              },
+              clearProps: "transform,opacity",
+              scrollTrigger: { trigger: element, start, once: true },
             },
           );
         });
 
-        entranceTimeline = gsap
-          .timeline({
-            paused: true,
-            defaults: { ease: "power3.out" },
-            onStart: () => {
-              loader.style.pointerEvents = "none";
-            },
-            onComplete: () => {
-              loader.style.display = "none";
-              loader.setAttribute("aria-hidden", "true");
-              body.classList.add("site-entered");
-              requestAnimationFrame(() => ScrollTrigger.refresh());
-            },
-          })
-          .to(
-            scene,
-            {
-              opacity: 1,
-              duration: 1.18,
-              ease: "sine.out",
-            },
-            0.06,
-          )
-          .to(
-            loaderContent,
-            {
-              opacity: 0,
-              y: -6,
-              scale: 0.992,
-              duration: 0.62,
-              ease: "sine.inOut",
-              force3D: true,
-            },
-            0,
-          )
-          .to(
-            topPanel,
-            {
-              yPercent: -104,
-              duration: 1.38,
-              ease: "power4.inOut",
-              force3D: true,
-            },
-            0.2,
-          )
-          .to(
-            bottomPanel,
-            {
-              yPercent: 104,
-              duration: 1.38,
-              ease: "power4.inOut",
-              force3D: true,
-            },
-            0.2,
-          )
-          .to(
-            heroEyebrow,
-            {
-              opacity: 1,
-              y: 0,
-              filter: "blur(0px)",
-              duration: 0.62,
-              ease: "power3.out",
-              clearProps: "transform,filter,opacity",
-            },
-            0.62,
-          )
-          .to(
-            heroHeading,
-            {
-              opacity: 1,
-              y: 0,
-              clipPath: "inset(0 0 0% 0)",
-              filter: "blur(0px)",
-              duration: 0.94,
-              ease: "power4.out",
-              clearProps: "transform,filter,opacity,clipPath",
-            },
-            0.7,
-          )
-          .to(
-            heroText,
-            {
-              opacity: 1,
-              y: 0,
-              filter: "blur(0px)",
-              duration: 0.68,
-              ease: "power3.out",
-              clearProps: "transform,filter,opacity",
-            },
-            0.9,
-          )
-          .to(
-            heroActions,
-            {
-              opacity: 1,
-              y: 0,
-              duration: 0.58,
-              ease: "power3.out",
-              clearProps: "transform,opacity",
-            },
-            1.02,
-          )
-          .to(
-            heroDisciplines,
-            {
-              opacity: 1,
-              y: 0,
-              duration: 0.56,
-              ease: "power3.out",
-              clearProps: "transform,opacity",
-            },
-            1.12,
-          )
-          .to(
-            heroCue,
-            {
-              opacity: 1,
-              y: 0,
-              duration: 0.46,
-              ease: "power2.out",
-              clearProps: "transform,opacity",
-            },
-            1.2,
-          )
-          .to(
-            announcement,
-            {
-              opacity: 1,
-              y: 0,
-              duration: 0.52,
-              ease: "sine.out",
-              clearProps: "transform,opacity",
-            },
-            1.18,
-          )
-          .to(
-            header,
-            {
-              opacity: 1,
-              y: 0,
-              filter: "blur(0px)",
-              duration: 0.68,
-              ease: "power3.out",
-              clearProps: "transform,filter,opacity",
-            },
-            1.26,
-          )
-          .to(
-            headerBrand,
-            {
-              opacity: 1,
-              y: 0,
-              duration: 0.5,
-              ease: "power3.out",
-              clearProps: "transform,opacity",
-            },
-            1.34,
-          )
-          .to(
-            headerLinks,
-            {
-              opacity: 1,
-              y: 0,
-              duration: 0.46,
-              stagger: 0.065,
-              ease: "power3.out",
-              clearProps: "transform,opacity",
-            },
-            1.4,
-          )
-          .to(
-            headerButton,
-            {
-              opacity: 1,
-              y: 0,
-              duration: 0.5,
-              ease: "power3.out",
-              clearProps: "transform,opacity",
-            },
-            1.5,
-          )
-          .to(
-            header,
-            {
-              "--header-line-progress": 1,
-              duration: 0.72,
-              ease: "sine.out",
-            },
-            1.34,
-          )
-          .call(unlockScroll, undefined, 1.48);
+        entranceTimeline = gsap.timeline({
+          paused: true,
+          onStart: () => {
+            body.classList.add("site-entering");
+            loader.style.pointerEvents = "none";
+          },
+          onComplete: () => {
+            loader.style.display = "none";
+            loader.setAttribute("aria-hidden", "true");
+            body.classList.remove("site-entering");
+            body.classList.add("site-entered");
+            requestAnimationFrame(() => ScrollTrigger.refresh());
+          },
+        });
 
+        entranceTimeline
+          .to(scene, {
+            opacity: 1,
+            duration: 0.9,
+            ease: "sine.out",
+          }, 0)
+          .to(loaderContent, {
+            opacity: 0,
+            y: -4,
+            duration: 0.42,
+            ease: "sine.inOut",
+            force3D: true,
+          }, 0)
+          .to(topPanel, {
+            yPercent: -102,
+            duration: 1.08,
+            ease: "power2.inOut",
+            force3D: true,
+          }, 0.22)
+          .to(bottomPanel, {
+            yPercent: 102,
+            duration: 1.08,
+            ease: "power2.inOut",
+            force3D: true,
+          }, 0.22)
+          .to(heroEyebrow, {
+            opacity: 1,
+            y: 0,
+            duration: 0.48,
+            ease: "power3.out",
+            clearProps: "transform,opacity",
+          }, 0.58)
+          .to(heroHeading, {
+            opacity: 1,
+            y: 0,
+            duration: 0.72,
+            ease: "power4.out",
+            clearProps: "transform,opacity",
+          }, 0.66)
+          .to(heroText, {
+            opacity: 1,
+            y: 0,
+            duration: 0.55,
+            ease: "power3.out",
+            clearProps: "transform,opacity",
+          }, 0.82)
+          .to(heroActions, {
+            opacity: 1,
+            y: 0,
+            duration: 0.48,
+            ease: "power3.out",
+            clearProps: "transform,opacity",
+          }, 0.94)
+          .to(heroDisciplines, {
+            opacity: 1,
+            y: 0,
+            duration: 0.46,
+            ease: "power3.out",
+            clearProps: "transform,opacity",
+          }, 1.04)
+          .to(heroCue, {
+            opacity: 1,
+            y: 0,
+            duration: 0.4,
+            ease: "power2.out",
+            clearProps: "transform,opacity",
+          }, 1.12)
+          .to(announcement, {
+            opacity: 1,
+            y: 0,
+            duration: 0.42,
+            ease: "sine.out",
+            clearProps: "transform,opacity",
+          }, 1.06)
+          .to(header, {
+            opacity: 1,
+            y: 0,
+            duration: 0.52,
+            ease: "power3.out",
+            clearProps: "transform,opacity",
+          }, 1.14)
+          .to(headerBrand, {
+            opacity: 1,
+            y: 0,
+            duration: 0.42,
+            ease: "power3.out",
+            clearProps: "transform,opacity",
+          }, 1.2)
+          .to(headerLinks, {
+            opacity: 1,
+            y: 0,
+            duration: 0.38,
+            stagger: 0.05,
+            ease: "power3.out",
+            clearProps: "transform,opacity",
+          }, 1.24)
+          .to(headerButton, {
+            opacity: 1,
+            y: 0,
+            duration: 0.42,
+            ease: "power3.out",
+            clearProps: "transform,opacity",
+          }, 1.34)
+          .to(header, {
+            "--header-line-progress": 1,
+            duration: 0.58,
+            ease: "sine.out",
+          }, 1.22)
+          .call(unlockScroll, undefined, 1.34);
       }, body);
 
       const pageReady =
@@ -854,11 +479,7 @@ export default function SiteMotion() {
             });
 
       try {
-        await Promise.all([
-          loaderTimelineFinished,
-          pageReady,
-          firstThreeJsFrameReady,
-        ]);
+        await Promise.all([loaderFinished, pageReady, firstThreeJsFrameReady]);
 
         if (!active) return;
 
@@ -892,7 +513,7 @@ export default function SiteMotion() {
         entranceTimeline?.kill();
         context.revert();
         unlockScroll();
-        body.classList.remove("motion-enabled");
+        body.classList.remove("motion-enabled", "site-entering");
       };
     };
 
@@ -902,7 +523,7 @@ export default function SiteMotion() {
       active = false;
       cleanupMotion();
       unlockScroll();
-      body.classList.remove("motion-enabled");
+      body.classList.remove("motion-enabled", "site-entering");
     };
   }, []);
 
@@ -930,76 +551,28 @@ export default function SiteMotion() {
           </span>
         </div>
 
-        <div className="site-loader__power" aria-hidden="true">
-          <svg
-            className="site-loader__schematic"
-            viewBox="0 0 560 186"
-            preserveAspectRatio="xMidYMid meet"
-          >
-            <g className="site-loader__base-wires">
-              <path d="M8 92H92" />
-              <path d="M92 92V42H196" />
-              <path d="M196 42V92H280V144" />
-              <path d="M280 144H386V92" />
-              <path d="M386 92H552" />
-              <path d="M196 42V14" />
-              <path d="M280 144V174" />
-              <path d="M386 92V38" />
-            </g>
+        <div className="site-loader__conduit" aria-hidden="true">
+          <span className="site-loader__rail site-loader__rail--left">
+            <i className="site-loader__charge site-loader__charge--left" />
+          </span>
 
-            <g className="site-loader__live-wires">
-              <path data-power-wire="input" d="M8 92H92" />
-              <path data-power-wire="mains" d="M92 92V42H196" />
-              <path data-power-wire="bus" d="M196 42V92H280V144" />
-              <path data-power-wire="plc" d="M280 144H386V92" />
-              <path data-power-wire="output" d="M386 92H552" />
-              <path data-power-branch="supply" d="M196 42V14" />
-              <path data-power-branch="bus" d="M280 144V174" />
-              <path data-power-branch="plc" d="M386 92V38" />
-            </g>
-
-            <g className="site-loader__nodes">
-              <circle data-power-node="source" cx="8" cy="92" r="5.8" />
-              <circle data-power-node="breaker" cx="92" cy="92" r="5.8" />
-              <circle data-power-node="supply" cx="196" cy="42" r="5.8" />
-              <circle data-power-node="bus" cx="280" cy="144" r="5.8" />
-              <circle data-power-node="plc" cx="386" cy="92" r="5.8" />
-              <circle data-power-node="output" cx="552" cy="92" r="5.8" />
-            </g>
-          </svg>
-
-          <div className="site-loader__power-core">
-            <i className="site-loader__arc site-loader__arc--one" />
-            <i className="site-loader__arc site-loader__arc--two" />
-            <span className="site-loader__core-ring" />
+          <span className="site-loader__core">
             <span className="site-loader__core-bolt">
               <svg viewBox="0 0 48 48">
                 <path d="M28.5 2 10 28h12l-2.5 18L38 19H26l2.5-17Z" />
               </svg>
             </span>
-          </div>
-        </div>
+          </span>
 
-        <div className="site-loader__stages" aria-hidden="true">
-          <span data-power-stage-card="mains">
-            <i className="site-loader__stage-led" />
-            MREŽA
-            <b>230V</b>
+          <span className="site-loader__rail site-loader__rail--right">
+            <i className="site-loader__charge site-loader__charge--right" />
           </span>
-          <span data-power-stage-card="bus">
-            <i className="site-loader__stage-led" />
-            BUS
-            <b>24V</b>
-          </span>
-          <span data-power-stage-card="plc">
-            <i className="site-loader__stage-led" />
-            PLC
-            <b>I/O</b>
-          </span>
+
+          <i className="site-loader__signal" />
         </div>
 
         <div className="site-loader__meta">
-          <span data-loader-status>PROVJERA INSTALACIJE</span>
+          <span data-loader-status>NAPAJANJE SISTEMA</span>
           <strong>
             <b data-loader-progress>00</b>
             <small>%</small>
