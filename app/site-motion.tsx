@@ -47,7 +47,6 @@ export default function SiteMotion() {
       const loaderStatus = loader.querySelector<HTMLElement>("[data-loader-status]");
       const loaderBrand = loader.querySelector<HTMLElement>(".site-loader__brand");
       const loaderMeta = loader.querySelector<HTMLElement>(".site-loader__meta");
-      const loaderCircuit = loader.querySelector<HTMLElement>(".site-loader__circuit");
       const loaderContent = loader.querySelector<HTMLElement>(".site-loader__content");
       const topPanel = loader.querySelector<HTMLElement>(".site-loader__panel--top");
       const bottomPanel = loader.querySelector<HTMLElement>(".site-loader__panel--bottom");
@@ -66,7 +65,6 @@ export default function SiteMotion() {
         !loaderStatus ||
         !loaderBrand ||
         !loaderMeta ||
-        !loaderCircuit ||
         !loaderContent ||
         !topPanel ||
         !bottomPanel
@@ -99,9 +97,7 @@ export default function SiteMotion() {
         const value = Math.min(100, Math.max(0, progress.value));
         const displayValue = value >= 99.95 ? 100 : Math.floor(value);
         progressValue.textContent = String(displayValue).padStart(2, "0");
-        loader.style.setProperty("--loader-progress", `${value}%`);
-
-        const nextStage = value >= 92 ? 4 : value >= 72 ? 3 : value >= 42 ? 2 : value >= 14 ? 1 : 0;
+        const nextStage = value >= 78 ? 4 : value >= 62 ? 3 : value >= 38 ? 2 : value >= 14 ? 1 : 0;
         if (nextStage !== powerStage) {
           powerStage = nextStage;
           loader.dataset.powerStage = String(powerStage);
@@ -174,22 +170,26 @@ export default function SiteMotion() {
         gsap.set(heroDisciplines, { opacity: 0, y: mobile ? 10 : 16 });
         gsap.set(heroCue, { opacity: 0, y: 10 });
 
-        gsap.set([loaderBrand, loaderMeta, loaderCircuit], { opacity: 0, y: 12 });
+        gsap.set([loaderBrand, loaderMeta], { opacity: 0, y: 12 });
 
         gsap
           .timeline()
           .to(loaderBrand, { opacity: 1, y: 0, duration: 0.42, ease: "power3.out" })
-          .to(loaderCircuit, { opacity: 1, y: 0, duration: 0.28, ease: "power2.out" }, 0.12)
           .to(loaderMeta, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }, 0.18);
 
         progressTween = gsap.to(progress, {
           value: 100,
-          duration: 3.2,
+          duration: 3,
           ease: "power1.inOut",
           onUpdate: renderProgress,
           onComplete: () => {
-            renderProgress();
-            minimumTimer = window.setTimeout(finishPowerSequence, 800);
+            progress.value = 100;
+            powerStage = 4;
+            loader.dataset.powerStage = "4";
+            loader.classList.add("is-charged", "is-complete");
+            loaderStatus.textContent = "SISTEM POD NAPONOM";
+            progressValue.textContent = "100";
+            minimumTimer = window.setTimeout(finishPowerSequence, 1000);
           },
         });
 
@@ -563,21 +563,6 @@ export default function SiteMotion() {
           <span><i />MREŽA <b>230V</b></span>
           <span><i />BUS <b>24V</b></span>
           <span><i />PLC <b>I/O</b></span>
-        </div>
-
-        <div className="site-loader__bus-meter" aria-hidden="true">
-          <span className="site-loader__bus-label">ENERGETSKA SABIRNICA</span>
-          <div className="site-loader__bus-track">
-            <i className="site-loader__bus-charge" />
-            <b className="site-loader__bus-head" />
-          </div>
-          <span className="site-loader__bus-voltage">0 — 230V</span>
-        </div>
-
-        <div className="site-loader__circuit" aria-hidden="true">
-          <i />
-          <i />
-          <i />
         </div>
 
         <div className="site-loader__meta">
