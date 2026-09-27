@@ -276,8 +276,8 @@ export default function SiteMotion() {
           y: reducedMotion ? 0 : 12,
         });
         gsap.set(loaderMeta, {
-          opacity: reducedMotion ? 1 : 0,
-          y: reducedMotion ? 0 : 10,
+          opacity: 1,
+          y: 0,
         });
 
         liveWires.forEach((path, index) => setWireOff(path, wireLengths[index]));
@@ -342,7 +342,6 @@ export default function SiteMotion() {
           );
 
           master.to(loaderBrand, { opacity: 1, y: 0, duration: 0.34, ease: "power2.out" }, 0.2);
-          master.to(loaderMeta, { opacity: 1, y: 0, duration: 0.28, ease: "power2.out" }, 0.28);
 
           master.call(() => setStatus("MREŽA 230V PRISUTNA"), [], 0.4);
           master.to(coreRing, { borderColor: "rgba(244,183,0,.42)", scale: 1, duration: 0.35 }, 0.4);
