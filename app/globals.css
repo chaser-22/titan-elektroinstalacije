@@ -2231,20 +2231,41 @@ footer > a:last-child { display: flex; min-height: 44px; align-items: center; ju
 }
 
 .site-loader__progress {
-  height: 2px;
-  margin-top: 12px;
+  position: relative;
+  height: 3px;
+  margin-top: 14px;
   overflow: hidden;
-  background: rgba(255,255,255,.11);
+  background:
+    linear-gradient(90deg, rgba(255,255,255,.05), rgba(255,255,255,.14), rgba(255,255,255,.05));
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.025);
 }
 
 .site-loader__progress i {
+  position: relative;
   display: block;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, #8c6900, var(--yellow), var(--yellow-soft));
-  box-shadow: 0 0 20px rgba(244,183,0,.3);
+  background:
+    linear-gradient(90deg, #7b5c00 0%, #c89400 35%, var(--yellow) 72%, var(--yellow-soft) 100%);
+  box-shadow:
+    0 0 18px rgba(244,183,0,.22),
+    0 0 38px rgba(244,183,0,.1);
   transform: scaleX(0);
   transform-origin: left center;
+  will-change: transform;
+}
+
+.site-loader__progress i::after {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  width: 44px;
+  height: 9px;
+  content: "";
+  background: radial-gradient(ellipse at center, rgba(255,238,170,.8), rgba(244,183,0,.28) 38%, transparent 72%);
+  filter: blur(.4px);
+  opacity: .82;
+  transform: translate(45%, -50%);
 }
 
 .motion-enabled .site-header::after {
