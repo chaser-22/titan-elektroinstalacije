@@ -44,12 +44,10 @@ export default function SiteMotion() {
       const heroCue = document.querySelector<HTMLElement>('[data-hero="cue"]');
 
       const progressValue = loader.querySelector<HTMLElement>("[data-loader-progress]");
-      const progressFill = loader.querySelector<HTMLElement>("[data-loader-fill]");
       const loaderStatus = loader.querySelector<HTMLElement>("[data-loader-status]");
       const loaderBrand = loader.querySelector<HTMLElement>(".site-loader__brand");
       const loaderMeta = loader.querySelector<HTMLElement>(".site-loader__meta");
       const loaderCircuit = loader.querySelector<HTMLElement>(".site-loader__circuit");
-      const loaderProgress = loader.querySelector<HTMLElement>(".site-loader__progress");
       const loaderContent = loader.querySelector<HTMLElement>(".site-loader__content");
       const topPanel = loader.querySelector<HTMLElement>(".site-loader__panel--top");
       const bottomPanel = loader.querySelector<HTMLElement>(".site-loader__panel--bottom");
@@ -65,12 +63,10 @@ export default function SiteMotion() {
         !heroDisciplines ||
         !heroCue ||
         !progressValue ||
-        !progressFill ||
         !loaderStatus ||
         !loaderBrand ||
         !loaderMeta ||
         !loaderCircuit ||
-        !loaderProgress ||
         !loaderContent ||
         !topPanel ||
         !bottomPanel
@@ -103,7 +99,7 @@ export default function SiteMotion() {
         const value = Math.min(100, Math.max(0, progress.value));
         const displayValue = value >= 99.95 ? 100 : Math.floor(value);
         progressValue.textContent = String(displayValue).padStart(2, "0");
-        progressFill.style.transform = `scaleX(${value / 100})`;
+        loader.style.setProperty("--loader-charge", `${value * 3.6}deg`);
 
         const nextStage = value >= 99.8 ? 4 : value >= 72 ? 3 : value >= 42 ? 2 : value >= 14 ? 1 : 0;
         if (nextStage !== powerStage) {
@@ -319,7 +315,6 @@ export default function SiteMotion() {
             },
             0.02,
           )
-          .to(loaderProgress, { opacity: 0, duration: 0.24, ease: "power2.out" }, 0.02)
           .to(topPanel, { yPercent: -102, duration: 1.08, ease: "expo.inOut" }, 0.22)
           .to(bottomPanel, { yPercent: 102, duration: 1.08, ease: "expo.inOut" }, 0.22)
           .to(
@@ -560,6 +555,8 @@ export default function SiteMotion() {
           </svg>
 
           <div className="site-loader__power-core">
+            <span className="site-loader__charge-ring" />
+            <span className="site-loader__charge-ring-mask" />
             <i className="site-loader__arc site-loader__arc--one" />
             <i className="site-loader__arc site-loader__arc--two" />
             <span className="site-loader__core-ring" />
@@ -588,9 +585,6 @@ export default function SiteMotion() {
           <strong><b data-loader-progress>00</b><small>%</small></strong>
         </div>
 
-        <div className="site-loader__progress" aria-hidden="true">
-          <i data-loader-fill />
-        </div>
       </div>
     </div>
   );
