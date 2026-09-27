@@ -48,6 +48,8 @@ export default function SiteMotion() {
       const loaderBrand = loader.querySelector<HTMLElement>(".site-loader__brand");
       const loaderMeta = loader.querySelector<HTMLElement>(".site-loader__meta");
       const loaderCircuit = loader.querySelector<HTMLElement>(".site-loader__circuit");
+      const loaderProgress = loader.querySelector<HTMLElement>(".site-loader__progress");
+      const loaderContent = loader.querySelector<HTMLElement>(".site-loader__content");
       const topPanel = loader.querySelector<HTMLElement>(".site-loader__panel--top");
       const bottomPanel = loader.querySelector<HTMLElement>(".site-loader__panel--bottom");
 
@@ -66,6 +68,8 @@ export default function SiteMotion() {
         !loaderBrand ||
         !loaderMeta ||
         !loaderCircuit ||
+        !loaderProgress ||
+        !loaderContent ||
         !topPanel ||
         !bottomPanel
       ) {
@@ -93,12 +97,14 @@ export default function SiteMotion() {
 
       const progress = { value: 0 };
       const renderProgress = () => {
-        const value = Math.round(progress.value);
-        progressValue.textContent = String(value).padStart(2, "0");
+        const value = Math.min(100, Math.max(0, progress.value));
+        const displayValue = value >= 99.95 ? 100 : Math.floor(value);
+        progressValue.textContent = String(displayValue).padStart(2, "0");
         progressFill.style.transform = `scaleX(${value / 100})`;
       };
 
       let entranceTimeline: any = null;
+      let progressTween: any = null;
 
       const context = gsap.context(() => {
         if (reducedMotion) {
@@ -155,10 +161,10 @@ export default function SiteMotion() {
           .to(loaderCircuit, { opacity: 1, y: 0, duration: 0.28, ease: "power2.out" }, 0.12)
           .to(loaderMeta, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }, 0.18);
 
-        gsap.to(progress, {
-          value: 88,
-          duration: 0.72,
-          ease: "power2.out",
+        progressTween = gsap.to(progress, {
+          value: 96.5,
+          duration: 3.55,
+          ease: "power1.inOut",
           onUpdate: renderProgress,
         });
 
@@ -281,12 +287,20 @@ export default function SiteMotion() {
               requestAnimationFrame(() => ScrollTrigger.refresh());
             },
           })
-          .to(scene, { opacity: 1, duration: 0.65, ease: "power2.out" }, 0.05)
-          .to(loaderBrand, { opacity: 0, y: -12, duration: 0.24 }, 0.04)
-          .to(loaderMeta, { opacity: 0, y: -8, duration: 0.2 }, 0.08)
-          .to(loaderCircuit, { opacity: 0, duration: 0.18 }, 0.1)
-          .to(topPanel, { yPercent: -102, duration: 0.92, ease: "expo.inOut" }, 0.16)
-          .to(bottomPanel, { yPercent: 102, duration: 0.92, ease: "expo.inOut" }, 0.16)
+          .to(scene, { opacity: 1, duration: 0.82, ease: "power2.out" }, 0.08)
+          .to(
+            loaderContent,
+            {
+              opacity: 0,
+              y: -8,
+              duration: 0.42,
+              ease: "power3.inOut",
+            },
+            0.02,
+          )
+          .to(loaderProgress, { opacity: 0, duration: 0.24, ease: "power2.out" }, 0.02)
+          .to(topPanel, { yPercent: -102, duration: 1.08, ease: "expo.inOut" }, 0.22)
+          .to(bottomPanel, { yPercent: 102, duration: 1.08, ease: "expo.inOut" }, 0.22)
           .to(
             heroEyebrow,
             {
@@ -428,7 +442,7 @@ export default function SiteMotion() {
           });
 
       const waitMinimum = new Promise<void>((resolve) => {
-        minimumTimer = window.setTimeout(resolve, reducedMotion ? 80 : 420);
+        minimumTimer = window.setTimeout(resolve, reducedMotion ? 80 : 3550);
       });
 
       try {
@@ -451,14 +465,19 @@ export default function SiteMotion() {
             },
           });
         } else {
+          progressTween?.kill();
           await new Promise<void>((resolve) => {
             gsap.to(progress, {
               value: 100,
-              duration: 0.24,
-              ease: "power2.out",
+              duration: 0.35,
+              ease: "power1.inOut",
               onUpdate: renderProgress,
               onComplete: resolve,
             });
+          });
+
+          await new Promise<void>((resolve) => {
+            minimumTimer = window.setTimeout(resolve, 120);
           });
 
           if (!active) return;
@@ -474,6 +493,7 @@ export default function SiteMotion() {
       cleanupMotion = () => {
         if (sceneFallback) window.clearTimeout(sceneFallback);
         if (minimumTimer) window.clearTimeout(minimumTimer);
+        progressTween?.kill();
         entranceTimeline?.kill();
         context.revert();
         unlockScroll();
