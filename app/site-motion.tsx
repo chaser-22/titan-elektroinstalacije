@@ -45,6 +45,7 @@ export default function SiteMotion() {
 
       const progressValue = loader.querySelector<HTMLElement>("[data-loader-progress]");
       const progressFill = loader.querySelector<HTMLElement>("[data-loader-fill]");
+      const loaderStatus = loader.querySelector<HTMLElement>("[data-loader-status]");
       const loaderBrand = loader.querySelector<HTMLElement>(".site-loader__brand");
       const loaderMeta = loader.querySelector<HTMLElement>(".site-loader__meta");
       const loaderCircuit = loader.querySelector<HTMLElement>(".site-loader__circuit");
@@ -65,6 +66,7 @@ export default function SiteMotion() {
         !heroCue ||
         !progressValue ||
         !progressFill ||
+        !loaderStatus ||
         !loaderBrand ||
         !loaderMeta ||
         !loaderCircuit ||
@@ -96,11 +98,30 @@ export default function SiteMotion() {
       root.style.overflow = "hidden";
 
       const progress = { value: 0 };
+      let powerStage = -1;
       const renderProgress = () => {
         const value = Math.min(100, Math.max(0, progress.value));
         const displayValue = value >= 99.95 ? 100 : Math.floor(value);
         progressValue.textContent = String(displayValue).padStart(2, "0");
         progressFill.style.transform = `scaleX(${value / 100})`;
+
+        const nextStage = value >= 99.8 ? 4 : value >= 72 ? 3 : value >= 42 ? 2 : value >= 14 ? 1 : 0;
+        if (nextStage !== powerStage) {
+          powerStage = nextStage;
+          loader.dataset.powerStage = String(powerStage);
+          loader.classList.toggle("is-charged", powerStage === 4);
+
+          loaderStatus.textContent =
+            powerStage === 4
+              ? "SISTEM POD NAPONOM"
+              : powerStage === 3
+                ? "PLC / I-O ONLINE"
+                : powerStage === 2
+                  ? "KONTROLNI BUS 24V"
+                  : powerStage === 1
+                    ? "MREŽA 230V PRISUTNA"
+                    : "PROVJERA INSTALACIJE";
+        }
       };
 
       let entranceTimeline: any = null;
@@ -477,7 +498,7 @@ export default function SiteMotion() {
           });
 
           await new Promise<void>((resolve) => {
-            minimumTimer = window.setTimeout(resolve, 120);
+            minimumTimer = window.setTimeout(resolve, 180);
           });
 
           if (!active) return;
@@ -527,6 +548,35 @@ export default function SiteMotion() {
           </span>
         </div>
 
+        <div className="site-loader__power" aria-hidden="true">
+          <svg className="site-loader__schematic" viewBox="0 0 560 186" preserveAspectRatio="none">
+            <path className="site-loader__wire site-loader__wire--base" d="M8 92H92V42H196V92H280V144H386V92H552" />
+            <path className="site-loader__wire site-loader__wire--live" d="M8 92H92V42H196V92H280V144H386V92H552" />
+            <path className="site-loader__branch" d="M196 42V14M280 144V174M386 92V38" />
+            <circle cx="92" cy="92" r="5" />
+            <circle cx="196" cy="42" r="5" />
+            <circle cx="280" cy="144" r="5" />
+            <circle cx="386" cy="92" r="5" />
+          </svg>
+
+          <div className="site-loader__power-core">
+            <i className="site-loader__arc site-loader__arc--one" />
+            <i className="site-loader__arc site-loader__arc--two" />
+            <span className="site-loader__core-ring" />
+            <span className="site-loader__core-bolt">
+              <svg viewBox="0 0 48 48">
+                <path d="M28.5 2 10 28h12l-2.5 18L38 19H26l2.5-17Z" />
+              </svg>
+            </span>
+          </div>
+        </div>
+
+        <div className="site-loader__stages" aria-hidden="true">
+          <span><i />MREŽA <b>230V</b></span>
+          <span><i />BUS <b>24V</b></span>
+          <span><i />PLC <b>I/O</b></span>
+        </div>
+
         <div className="site-loader__circuit" aria-hidden="true">
           <i />
           <i />
@@ -534,7 +584,7 @@ export default function SiteMotion() {
         </div>
 
         <div className="site-loader__meta">
-          <span>SISTEM / INICIJALIZACIJA</span>
+          <span data-loader-status>PROVJERA INSTALACIJE</span>
           <strong><b data-loader-progress>00</b><small>%</small></strong>
         </div>
 
