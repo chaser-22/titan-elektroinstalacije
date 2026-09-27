@@ -98,7 +98,7 @@ export default function SiteMotion() {
         progressFill.style.transform = `scaleX(${value / 100})`;
       };
 
-      let entranceTimeline: ReturnType<typeof gsap.timeline> | null = null;
+      let entranceTimeline: any = null;
 
       const context = gsap.context(() => {
         if (reducedMotion) {
