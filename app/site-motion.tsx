@@ -2,11 +2,6 @@
 
 import { useLayoutEffect, useRef } from "react";
 
-type GsapTimeline = {
-  play: (from?: number) => void;
-  kill: () => void;
-};
-
 export default function SiteMotion() {
   const loaderRef = useRef<HTMLDivElement>(null);
 
@@ -217,8 +212,8 @@ export default function SiteMotion() {
         loader.classList.add("is-complete");
       };
 
-      let loaderTimeline: GsapTimeline | null = null;
-      let entranceTimeline: GsapTimeline | null = null;
+      let loaderTimeline: any = null;
+      let entranceTimeline: any = null;
       let resolveLoaderTimeline = () => {};
       const loaderTimelineFinished = new Promise<void>((resolve) => {
         resolveLoaderTimeline = resolve;
@@ -522,7 +517,7 @@ export default function SiteMotion() {
           // Explicit completed-state hold. Nothing electrical is still animating here.
           master.call(() => {}, [], 4.0);
 
-          loaderTimeline = master as unknown as GsapTimeline;
+          loaderTimeline = master;
           loaderTimeline.play(0);
         }
 
@@ -786,7 +781,6 @@ export default function SiteMotion() {
           )
           .call(unlockScroll, undefined, 1.2);
 
-        entranceTimeline = entranceTimeline as unknown as GsapTimeline;
       }, body);
 
       const pageReady =
