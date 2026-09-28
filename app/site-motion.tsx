@@ -121,19 +121,19 @@ export default function SiteMotion() {
         if (!reducedMotion) {
           gsap.set(scene, {
             opacity: 0,
-            scale: mobile ? 1.008 : 1.018,
+            scale: mobile ? 1.014 : 1.025,
             transformOrigin: "50% 50%",
           });
-          gsap.set(announcement, { opacity: 0, y: -6 });
-          gsap.set(header, { opacity: 0, y: -12 });
-          gsap.set([headerBrand, ...headerLinks, headerButton], { opacity: 0, y: -6 });
+          gsap.set(announcement, { opacity: 0, y: -10 });
+          gsap.set(header, { opacity: 0, y: -18 });
+          gsap.set([headerBrand, ...headerLinks, headerButton], { opacity: 0, y: -10 });
 
-          gsap.set(heroEyebrow, { opacity: 0, y: 8 });
-          gsap.set(heroHeading, { opacity: 0, y: mobile ? 14 : 18 });
-          gsap.set(heroText, { opacity: 0, y: 12 });
-          gsap.set(heroActions, { opacity: 0, y: 10 });
-          gsap.set(heroDisciplines, { opacity: 0, y: 8 });
-          gsap.set(heroCue, { opacity: 0, y: 6 });
+          gsap.set(heroEyebrow, { opacity: 0, y: 12 });
+          gsap.set(heroHeading, { opacity: 0, y: mobile ? 22 : 30 });
+          gsap.set(heroText, { opacity: 0, y: mobile ? 14 : 18 });
+          gsap.set(heroActions, { opacity: 0, y: 14 });
+          gsap.set(heroDisciplines, { opacity: 0, y: 12 });
+          gsap.set(heroCue, { opacity: 0, y: 10 });
         }
 
         // Loader true first frame.
@@ -354,8 +354,6 @@ export default function SiteMotion() {
             loader.style.pointerEvents = "none";
           },
           onComplete: () => {
-            loader.style.display = "none";
-            loader.setAttribute("aria-hidden", "true");
             body.classList.remove("motion-enabled", "site-entering");
             body.classList.add("site-entered");
             requestAnimationFrame(() => ScrollTrigger.refresh());
@@ -363,116 +361,119 @@ export default function SiteMotion() {
         });
 
         entranceTimeline
-          // Loader clears quickly.
+          // 1) Finish and physically remove the loader first.
           .to(loaderContent, {
             opacity: 0,
             y: -4,
-            duration: 0.26,
+            duration: 0.22,
             ease: "sine.inOut",
             force3D: true,
           }, 0)
           .to(topPanel, {
             yPercent: -103,
-            duration: 0.76,
+            duration: 0.72,
             ease: "power3.inOut",
             force3D: true,
-          }, 0.08)
+          }, 0.06)
           .to(bottomPanel, {
             yPercent: 103,
-            duration: 0.76,
+            duration: 0.72,
             ease: "power3.inOut",
             force3D: true,
-          }, 0.08)
+          }, 0.06)
+          .call(() => {
+            loader.style.display = "none";
+            loader.setAttribute("aria-hidden", "true");
+            root.classList.remove("site-loading");
+          }, [], 0.8)
 
-          // Page emerges immediately after the loader begins clearing.
+          // 2) Only now animate the exposed website into place.
           .to(scene, {
             opacity: 1,
             scale: 1,
-            duration: 0.62,
+            duration: 0.58,
             ease: "sine.out",
             clearProps: "transform,opacity",
-          }, 0.38)
+          }, 0.82)
           .to(announcement, {
             opacity: 1,
             y: 0,
             duration: 0.34,
-            ease: "power2.out",
+            ease: "power3.out",
             clearProps: "transform,opacity",
-          }, 0.52)
+          }, 0.86)
           .to(header, {
             opacity: 1,
             y: 0,
-            duration: 0.44,
+            duration: 0.42,
             ease: "power3.out",
             clearProps: "transform,opacity",
-          }, 0.56)
+          }, 0.9)
           .to(headerBrand, {
             opacity: 1,
             y: 0,
-            duration: 0.32,
+            duration: 0.34,
             ease: "power3.out",
             clearProps: "transform,opacity",
-          }, 0.62)
+          }, 0.96)
           .to(headerLinks, {
             opacity: 1,
             y: 0,
-            duration: 0.3,
-            stagger: 0.035,
+            duration: 0.32,
+            stagger: 0.045,
             ease: "power3.out",
             clearProps: "transform,opacity",
-          }, 0.68)
+          }, 1.0)
           .to(headerButton, {
             opacity: 1,
             y: 0,
-            duration: 0.32,
+            duration: 0.34,
             ease: "power3.out",
             clearProps: "transform,opacity",
-          }, 0.8)
-
-          // Hero follows in a compact stagger, like the reference.
+          }, 1.12)
           .to(heroEyebrow, {
             opacity: 1,
             y: 0,
-            duration: 0.3,
+            duration: 0.34,
             ease: "power3.out",
             clearProps: "transform,opacity",
-          }, 0.68)
+          }, 0.98)
           .to(heroHeading, {
             opacity: 1,
             y: 0,
-            duration: 0.5,
+            duration: 0.54,
             ease: "power4.out",
             clearProps: "transform,opacity",
-          }, 0.78)
+          }, 1.05)
           .to(heroText, {
+            opacity: 1,
+            y: 0,
+            duration: 0.4,
+            ease: "power3.out",
+            clearProps: "transform,opacity",
+          }, 1.18)
+          .to(heroActions, {
             opacity: 1,
             y: 0,
             duration: 0.36,
             ease: "power3.out",
             clearProps: "transform,opacity",
-          }, 0.96)
-          .to(heroActions, {
+          }, 1.28)
+          .to(heroDisciplines, {
             opacity: 1,
             y: 0,
             duration: 0.34,
             ease: "power3.out",
             clearProps: "transform,opacity",
-          }, 1.06)
-          .to(heroDisciplines, {
-            opacity: 1,
-            y: 0,
-            duration: 0.32,
-            ease: "power3.out",
-            clearProps: "transform,opacity",
-          }, 1.16)
+          }, 1.36)
           .to(heroCue, {
             opacity: 1,
             y: 0,
-            duration: 0.26,
+            duration: 0.3,
             ease: "power2.out",
             clearProps: "transform,opacity",
-          }, 1.25)
-          .call(unlockScroll, undefined, 1.32);
+          }, 1.44)
+          .call(unlockScroll, undefined, 1.46);
       }, body);
 
       const pageReady =
@@ -506,6 +507,7 @@ export default function SiteMotion() {
         if (!active) return;
 
         if (reducedMotion) {
+          root.classList.remove("site-loading");
           gsap.to(loader, {
             opacity: 0,
             duration: 0.14,
@@ -523,6 +525,7 @@ export default function SiteMotion() {
           entranceTimeline?.play(0);
         }
       } catch {
+        root.classList.remove("site-loading");
         unlockScroll();
         loader.style.display = "none";
         body.classList.remove("motion-enabled", "site-entering");
@@ -536,6 +539,7 @@ export default function SiteMotion() {
         loaderTimeline?.kill();
         entranceTimeline?.kill();
         context.revert();
+        root.classList.remove("site-loading");
         unlockScroll();
         body.classList.remove("motion-enabled", "site-entering");
       };
@@ -546,6 +550,7 @@ export default function SiteMotion() {
     return () => {
       active = false;
       cleanupMotion();
+      root.classList.remove("site-loading");
       unlockScroll();
       body.classList.remove("motion-enabled", "site-entering");
     };
