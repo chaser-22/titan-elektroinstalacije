@@ -43,21 +43,6 @@ export default function SiteMotion() {
       const mobile = window.matchMedia("(max-width: 820px)").matches;
 
       const scene = document.querySelector<HTMLElement>(".three-scene--plc");
-      const announcement = document.querySelector<HTMLElement>(".announcement");
-      const header = document.querySelector<HTMLElement>(".site-header");
-      const headerBrand = header?.querySelector<HTMLElement>(".brand");
-      const headerButton = header?.querySelector<HTMLElement>(".button");
-      const headerLinks = header
-        ? Array.from(header.querySelectorAll<HTMLElement>("nav a"))
-        : [];
-
-      const heroEyebrow = document.querySelector<HTMLElement>('[data-hero="eyebrow"]');
-      const heroHeading = document.querySelector<HTMLElement>('[data-hero="heading"]');
-      const heroText = document.querySelector<HTMLElement>('[data-hero="text"]');
-      const heroActions = document.querySelector<HTMLElement>('[data-hero="actions"]');
-      const heroDisciplines = document.querySelector<HTMLElement>('[data-hero="disciplines"]');
-      const heroCue = document.querySelector<HTMLElement>('[data-hero="cue"]');
-
       const loaderBrand = loader.querySelector<HTMLElement>(".site-loader__brand");
       const loaderContent = loader.querySelector<HTMLElement>(".site-loader__content");
       const loaderStatus = loader.querySelector<HTMLElement>("[data-loader-status]");
@@ -74,16 +59,6 @@ export default function SiteMotion() {
 
       if (
         !scene ||
-        !announcement ||
-        !header ||
-        !headerBrand ||
-        !headerButton ||
-        !heroEyebrow ||
-        !heroHeading ||
-        !heroText ||
-        !heroActions ||
-        !heroDisciplines ||
-        !heroCue ||
         !loaderBrand ||
         !loaderContent ||
         !loaderStatus ||
@@ -117,25 +92,7 @@ export default function SiteMotion() {
       });
 
       const context = gsap.context(() => {
-        // Short post-loader entrance: transform + opacity only.
-        if (!reducedMotion) {
-          gsap.set(scene, {
-            opacity: 0,
-            scale: mobile ? 1.014 : 1.025,
-            transformOrigin: "50% 50%",
-          });
-          gsap.set(announcement, { opacity: 0, y: -10 });
-          gsap.set(header, { opacity: 0, y: -18 });
-          gsap.set([headerBrand, ...headerLinks, headerButton], { opacity: 0, y: -10 });
-
-          gsap.set(heroEyebrow, { opacity: 0, y: 12 });
-          gsap.set(heroHeading, { opacity: 0, y: mobile ? 22 : 30 });
-          gsap.set(heroText, { opacity: 0, y: mobile ? 14 : 18 });
-          gsap.set(heroActions, { opacity: 0, y: 14 });
-          gsap.set(heroDisciplines, { opacity: 0, y: 12 });
-          gsap.set(heroCue, { opacity: 0, y: 10 });
-        }
-
+        // The initial website state is owned by server-rendered .site-loading CSS.
         // Loader true first frame.
         progress.value = 0;
         renderProgress();
@@ -354,6 +311,7 @@ export default function SiteMotion() {
             loader.style.pointerEvents = "none";
           },
           onComplete: () => {
+            root.classList.remove("site-loading", "site-revealing");
             body.classList.remove("motion-enabled", "site-entering");
             body.classList.add("site-entered");
             requestAnimationFrame(() => ScrollTrigger.refresh());
@@ -361,7 +319,7 @@ export default function SiteMotion() {
         });
 
         entranceTimeline
-          // 1) Finish and physically remove the loader first.
+          // Loader owns only its own exit.
           .to(loaderContent, {
             opacity: 0,
             y: -4,
@@ -382,98 +340,17 @@ export default function SiteMotion() {
             force3D: true,
           }, 0.06)
           .call(() => {
+            // The loader is physically gone before the website reveal starts.
             loader.style.display = "none";
             loader.setAttribute("aria-hidden", "true");
-            root.classList.remove("site-loading");
-          }, [], 0.8)
 
-          // 2) Only now animate the exposed website into place.
-          .to(scene, {
-            opacity: 1,
-            scale: 1,
-            duration: 0.58,
-            ease: "sine.out",
-            clearProps: "transform,opacity",
-          }, 0.82)
-          .to(announcement, {
-            opacity: 1,
-            y: 0,
-            duration: 0.34,
-            ease: "power3.out",
-            clearProps: "transform,opacity",
-          }, 0.86)
-          .to(header, {
-            opacity: 1,
-            y: 0,
-            duration: 0.42,
-            ease: "power3.out",
-            clearProps: "transform,opacity",
-          }, 0.9)
-          .to(headerBrand, {
-            opacity: 1,
-            y: 0,
-            duration: 0.34,
-            ease: "power3.out",
-            clearProps: "transform,opacity",
-          }, 0.96)
-          .to(headerLinks, {
-            opacity: 1,
-            y: 0,
-            duration: 0.32,
-            stagger: 0.045,
-            ease: "power3.out",
-            clearProps: "transform,opacity",
-          }, 1.0)
-          .to(headerButton, {
-            opacity: 1,
-            y: 0,
-            duration: 0.34,
-            ease: "power3.out",
-            clearProps: "transform,opacity",
-          }, 1.12)
-          .to(heroEyebrow, {
-            opacity: 1,
-            y: 0,
-            duration: 0.34,
-            ease: "power3.out",
-            clearProps: "transform,opacity",
-          }, 0.98)
-          .to(heroHeading, {
-            opacity: 1,
-            y: 0,
-            duration: 0.54,
-            ease: "power4.out",
-            clearProps: "transform,opacity",
-          }, 1.05)
-          .to(heroText, {
-            opacity: 1,
-            y: 0,
-            duration: 0.4,
-            ease: "power3.out",
-            clearProps: "transform,opacity",
-          }, 1.18)
-          .to(heroActions, {
-            opacity: 1,
-            y: 0,
-            duration: 0.36,
-            ease: "power3.out",
-            clearProps: "transform,opacity",
-          }, 1.28)
-          .to(heroDisciplines, {
-            opacity: 1,
-            y: 0,
-            duration: 0.34,
-            ease: "power3.out",
-            clearProps: "transform,opacity",
-          }, 1.36)
-          .to(heroCue, {
-            opacity: 1,
-            y: 0,
-            duration: 0.3,
-            ease: "power2.out",
-            clearProps: "transform,opacity",
-          }, 1.44)
-          .call(unlockScroll, undefined, 1.46);
+            // CSS now owns the visible page entrance. Keeping .site-loading for
+            // this frame guarantees every element has a real hidden start state.
+            root.classList.add("site-revealing");
+          }, [], 0.8)
+          .call(unlockScroll, undefined, 1.5)
+          // Keep the timeline alive until the final CSS stagger has settled.
+          .call(() => {}, [], 1.82);
       }, body);
 
       const pageReady =
@@ -507,7 +384,7 @@ export default function SiteMotion() {
         if (!active) return;
 
         if (reducedMotion) {
-          root.classList.remove("site-loading");
+          root.classList.remove("site-loading", "site-revealing");
           gsap.to(loader, {
             opacity: 0,
             duration: 0.14,
@@ -525,7 +402,7 @@ export default function SiteMotion() {
           entranceTimeline?.play(0);
         }
       } catch {
-        root.classList.remove("site-loading");
+        root.classList.remove("site-loading", "site-revealing");
         unlockScroll();
         loader.style.display = "none";
         body.classList.remove("motion-enabled", "site-entering");
@@ -539,7 +416,7 @@ export default function SiteMotion() {
         loaderTimeline?.kill();
         entranceTimeline?.kill();
         context.revert();
-        root.classList.remove("site-loading");
+        root.classList.remove("site-loading", "site-revealing");
         unlockScroll();
         body.classList.remove("motion-enabled", "site-entering");
       };
@@ -550,7 +427,7 @@ export default function SiteMotion() {
     return () => {
       active = false;
       cleanupMotion();
-      root.classList.remove("site-loading");
+      root.classList.remove("site-loading", "site-revealing");
       unlockScroll();
       body.classList.remove("motion-enabled", "site-entering");
     };
