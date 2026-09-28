@@ -2506,3 +2506,21 @@ footer > a:last-child { display: flex; min-height: 44px; align-items: center; ju
   }
 }
 
+
+
+/* Short post-loader reveal: compositor-only hints, removed with .motion-enabled */
+.motion-enabled .three-scene--plc,
+.motion-enabled .announcement,
+.motion-enabled .site-header,
+.motion-enabled .site-header .brand,
+.motion-enabled .site-header nav a,
+.motion-enabled .site-header .button,
+.motion-enabled [data-hero="eyebrow"],
+.motion-enabled [data-hero="heading"],
+.motion-enabled [data-hero="text"],
+.motion-enabled [data-hero="actions"],
+.motion-enabled [data-hero="disciplines"],
+.motion-enabled [data-hero="cue"] {
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+}
