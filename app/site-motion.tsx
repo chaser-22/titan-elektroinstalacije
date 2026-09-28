@@ -65,7 +65,9 @@ export default function SiteMotion() {
       const leftCharge = loader.querySelector<HTMLElement>(".site-loader__charge--left");
       const rightCharge = loader.querySelector<HTMLElement>(".site-loader__charge--right");
       const signal = loader.querySelector<HTMLElement>(".site-loader__signal");
+      const conduit = loader.querySelector<HTMLElement>(".site-loader__conduit");
       const core = loader.querySelector<HTMLElement>(".site-loader__core");
+      const coreFace = loader.querySelector<HTMLElement>(".site-loader__core-face");
       const coreBolt = loader.querySelector<HTMLElement>(".site-loader__core-bolt");
       const topPanel = loader.querySelector<HTMLElement>(".site-loader__panel--top");
       const bottomPanel = loader.querySelector<HTMLElement>(".site-loader__panel--bottom");
@@ -89,7 +91,9 @@ export default function SiteMotion() {
         !leftCharge ||
         !rightCharge ||
         !signal ||
+        !conduit ||
         !core ||
+        !coreFace ||
         !coreBolt ||
         !topPanel ||
         !bottomPanel
@@ -136,9 +140,17 @@ export default function SiteMotion() {
         gsap.set(loaderBrand, { opacity: reducedMotion ? 1 : 0, y: reducedMotion ? 0 : 10 });
         gsap.set(leftCharge, { scaleX: 0, transformOrigin: "left center" });
         gsap.set(rightCharge, { scaleX: 0, transformOrigin: "left center" });
-        gsap.set(signal, { opacity: 0, xPercent: 0 });
-        gsap.set(core, { scale: 0.96 });
-        gsap.set(coreBolt, { opacity: 0.35, scale: 0.92 });
+        const signalDistance = Math.max(0, conduit.getBoundingClientRect().width - 8);
+        gsap.set(signal, { opacity: 0, x: 0 });
+        gsap.set(core, {
+          scale: 0.94,
+          rotationX: 7,
+          rotationY: -11,
+          transformPerspective: 900,
+          transformOrigin: "50% 50%",
+        });
+        gsap.set(coreFace, { z: 18 });
+        gsap.set(coreBolt, { opacity: 0.32, scale: 0.88 });
 
         if (reducedMotion) {
           progress.value = 100;
@@ -147,7 +159,7 @@ export default function SiteMotion() {
           gsap.set(loaderBrand, { opacity: 1, y: 0 });
           gsap.set([leftCharge, rightCharge], { scaleX: 1 });
           gsap.set(signal, { opacity: 0 });
-          gsap.set(core, { scale: 1 });
+          gsap.set(core, { scale: 1, rotationX: 0, rotationY: 0 });
           gsap.set(coreBolt, { opacity: 1, scale: 1 });
           resolveLoader();
         } else {
@@ -183,23 +195,25 @@ export default function SiteMotion() {
           }, 0.46);
 
           master.to(signal, {
-            xPercent: 455,
+            x: signalDistance * 0.5,
             duration: 1.24,
             ease: "sine.inOut",
           }, 0.46);
 
           master.to(core, {
             scale: 1.035,
-            duration: 0.28,
-            ease: "power2.out",
-          }, 1.58);
+            rotationX: 1.5,
+            rotationY: -2,
+            duration: 0.42,
+            ease: "power3.out",
+          }, 1.54);
 
           master.to(coreBolt, {
             opacity: 1,
-            scale: 1.04,
-            duration: 0.34,
-            ease: "power2.out",
-          }, 1.58);
+            scale: 1.045,
+            duration: 0.42,
+            ease: "power3.out",
+          }, 1.56);
 
           master.call(() => {
             loaderStatus.textContent = "TOK USPOSTAVLJEN";
@@ -212,16 +226,18 @@ export default function SiteMotion() {
           }, 1.86);
 
           master.to(signal, {
-            xPercent: 920,
+            x: signalDistance,
             duration: 1.34,
             ease: "sine.inOut",
           }, 1.86);
 
           master.to(core, {
             scale: 1,
-            duration: 0.28,
+            rotationX: 0,
+            rotationY: 0,
+            duration: 0.54,
             ease: "sine.inOut",
-          }, 2.08);
+          }, 2.04);
 
           master.to(coreBolt, {
             scale: 1,
@@ -557,10 +573,18 @@ export default function SiteMotion() {
           </span>
 
           <span className="site-loader__core">
-            <span className="site-loader__core-bolt">
-              <svg viewBox="0 0 48 48">
-                <path d="M28.5 2 10 28h12l-2.5 18L38 19H26l2.5-17Z" />
-              </svg>
+            <span className="site-loader__core-back" />
+            <span className="site-loader__core-face">
+              <i className="site-loader__core-screw site-loader__core-screw--a" />
+              <i className="site-loader__core-screw site-loader__core-screw--b" />
+              <i className="site-loader__core-screw site-loader__core-screw--c" />
+              <i className="site-loader__core-screw site-loader__core-screw--d" />
+              <span className="site-loader__core-bolt">
+                <svg viewBox="0 0 48 48">
+                  <path d="M28.5 2 10 28h12l-2.5 18L38 19H26l2.5-17Z" />
+                </svg>
+              </span>
+              <small>230 / 24V</small>
             </span>
           </span>
 
