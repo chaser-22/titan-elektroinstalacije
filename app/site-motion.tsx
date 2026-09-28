@@ -348,9 +348,9 @@ export default function SiteMotion() {
             // this frame guarantees every element has a real hidden start state.
             root.classList.add("site-revealing");
           }, [], 0.8)
-          .call(unlockScroll, undefined, 1.5)
-          // Keep the timeline alive until the final CSS stagger has settled.
-          .call(() => {}, [], 1.82);
+          .call(unlockScroll, undefined, 2.12)
+          // Keep the timeline alive until the final CSS keyframe has settled.
+          .call(() => {}, [], 2.5);
       }, body);
 
       const pageReady =
