@@ -119,7 +119,12 @@ export default function SiteMotion() {
       const context = gsap.context(() => {
         // Page entrance initial state: transform/opacity only.
         if (!reducedMotion) {
-          gsap.set(scene, { opacity: 0 });
+          gsap.set(scene, {
+            opacity: 0,
+            scale: mobile ? 1.012 : 1.026,
+            xPercent: mobile ? 0.8 : 1.8,
+            transformOrigin: "50% 50%",
+          });
           gsap.set(announcement, { opacity: 0, y: -8 });
           gsap.set(header, { opacity: 0, y: -16, "--header-line-progress": 0 });
           gsap.set([headerBrand, ...headerLinks, headerButton], { opacity: 0, y: -8 });
@@ -359,114 +364,127 @@ export default function SiteMotion() {
         });
 
         entranceTimeline
-          .to(scene, {
-            opacity: 1,
-            duration: 0.9,
-            ease: "sine.out",
-          }, 0)
+          // First, let the loading interface disappear cleanly.
           .to(loaderContent, {
             opacity: 0,
-            y: -4,
-            duration: 0.42,
+            y: -6,
+            duration: 0.36,
             ease: "sine.inOut",
             force3D: true,
           }, 0)
           .to(topPanel, {
-            yPercent: -102,
-            duration: 1.08,
-            ease: "power2.inOut",
+            yPercent: -103,
+            duration: 0.96,
+            ease: "power3.inOut",
             force3D: true,
-          }, 0.22)
+          }, 0.14)
           .to(bottomPanel, {
-            yPercent: 102,
-            duration: 1.08,
-            ease: "power2.inOut",
+            yPercent: 103,
+            duration: 0.96,
+            ease: "power3.inOut",
             force3D: true,
-          }, 0.22)
+          }, 0.14)
+
+          // The real 3D scene is the first website element to arrive.
+          .call(() => {
+            window.dispatchEvent(new CustomEvent("titan:enter-3d"));
+          }, [], 1.02)
+          .to(scene, {
+            opacity: 1,
+            scale: 1,
+            xPercent: 0,
+            duration: 0.72,
+            ease: "sine.out",
+            clearProps: "transform,opacity",
+          }, 1.04)
+
+          // Then reveal hero content with a deliberate one-by-one rhythm.
           .to(heroEyebrow, {
             opacity: 1,
             y: 0,
-            duration: 0.48,
+            duration: 0.44,
             ease: "power3.out",
             clearProps: "transform,opacity",
-          }, 0.58)
+          }, 1.42)
           .to(heroHeading, {
             opacity: 1,
             y: 0,
-            duration: 0.72,
+            duration: 0.68,
             ease: "power4.out",
             clearProps: "transform,opacity",
-          }, 0.66)
+          }, 1.58)
           .to(heroText, {
-            opacity: 1,
-            y: 0,
-            duration: 0.55,
-            ease: "power3.out",
-            clearProps: "transform,opacity",
-          }, 0.82)
-          .to(heroActions, {
-            opacity: 1,
-            y: 0,
-            duration: 0.48,
-            ease: "power3.out",
-            clearProps: "transform,opacity",
-          }, 0.94)
-          .to(heroDisciplines, {
-            opacity: 1,
-            y: 0,
-            duration: 0.46,
-            ease: "power3.out",
-            clearProps: "transform,opacity",
-          }, 1.04)
-          .to(heroCue, {
-            opacity: 1,
-            y: 0,
-            duration: 0.4,
-            ease: "power2.out",
-            clearProps: "transform,opacity",
-          }, 1.12)
-          .to(announcement, {
-            opacity: 1,
-            y: 0,
-            duration: 0.42,
-            ease: "sine.out",
-            clearProps: "transform,opacity",
-          }, 1.06)
-          .to(header, {
             opacity: 1,
             y: 0,
             duration: 0.52,
             ease: "power3.out",
             clearProps: "transform,opacity",
-          }, 1.14)
+          }, 1.82)
+          .to(heroActions, {
+            opacity: 1,
+            y: 0,
+            duration: 0.46,
+            ease: "power3.out",
+            clearProps: "transform,opacity",
+          }, 2.02)
+          .to(heroDisciplines, {
+            opacity: 1,
+            y: 0,
+            duration: 0.44,
+            ease: "power3.out",
+            clearProps: "transform,opacity",
+          }, 2.18)
+          .to(heroCue, {
+            opacity: 1,
+            y: 0,
+            duration: 0.36,
+            ease: "power2.out",
+            clearProps: "transform,opacity",
+          }, 2.34)
+
+          // Header comes last so it never competes with the hero reveal.
+          .to(announcement, {
+            opacity: 1,
+            y: 0,
+            duration: 0.4,
+            ease: "sine.out",
+            clearProps: "transform,opacity",
+          }, 2.26)
+          .to(header, {
+            opacity: 1,
+            y: 0,
+            duration: 0.5,
+            ease: "power3.out",
+            clearProps: "transform,opacity",
+          }, 2.38)
           .to(headerBrand, {
             opacity: 1,
             y: 0,
-            duration: 0.42,
+            duration: 0.38,
             ease: "power3.out",
             clearProps: "transform,opacity",
-          }, 1.2)
+          }, 2.5)
           .to(headerLinks, {
             opacity: 1,
             y: 0,
-            duration: 0.38,
-            stagger: 0.05,
+            duration: 0.34,
+            stagger: 0.07,
             ease: "power3.out",
             clearProps: "transform,opacity",
-          }, 1.24)
+          }, 2.62)
           .to(headerButton, {
             opacity: 1,
             y: 0,
-            duration: 0.42,
+            duration: 0.38,
             ease: "power3.out",
             clearProps: "transform,opacity",
-          }, 1.34)
+          }, 2.84)
           .to(header, {
             "--header-line-progress": 1,
-            duration: 0.58,
+            duration: 0.56,
             ease: "sine.out",
-          }, 1.22)
-          .call(unlockScroll, undefined, 1.34);
+          }, 2.52)
+          .call(unlockScroll, undefined, 2.82);
       }, body);
 
       const pageReady =
