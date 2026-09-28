@@ -1112,11 +1112,9 @@ export default function ElectricalScene() {
         });
       };
 
-      window.addEventListener("titan:enter-3d", playSceneIntro, { once: true });
-
-      if (reducedMotion.matches) {
-        playSceneIntro();
-      }
+      // Finish the cabinet intro behind the loader so the website is already
+      // in its settled state when the loading screen opens.
+      playSceneIntro();
 
       const scrollTrigger = ScrollTrigger.create({
         trigger: "#glavni-sadrzaj",
@@ -1565,7 +1563,6 @@ export default function ElectricalScene() {
         delete document.documentElement.dataset.titanSceneReady;
 
         scrollTrigger.kill();
-        window.removeEventListener("titan:enter-3d", playSceneIntro);
         introTween?.kill();
         introModuleTweens.forEach((tween) => tween.kill());
         idleTweens.forEach((tween) => tween.kill());
