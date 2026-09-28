@@ -2345,19 +2345,6 @@ footer > a:last-child { display: flex; min-height: 44px; align-items: center; ju
   letter-spacing: .08em;
 }
 
-.motion-enabled:not(.site-entering):not(.site-entered) .announcement__track {
-  animation-play-state: paused;
-}
-
-.motion-enabled .site-header::after {
-  transform: scaleX(var(--header-line-progress, 0));
-  transform-origin: left center;
-}
-
-.motion-enabled .three-scene--plc {
-  will-change: opacity;
-}
-
 [data-reveal="heading"] {
   transform-origin: left bottom;
 }
