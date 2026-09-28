@@ -43,6 +43,21 @@ export default function SiteMotion() {
       const mobile = window.matchMedia("(max-width: 820px)").matches;
 
       const scene = document.querySelector<HTMLElement>(".three-scene--plc");
+      const announcement = document.querySelector<HTMLElement>(".announcement");
+      const header = document.querySelector<HTMLElement>(".site-header");
+      const headerBrand = header?.querySelector<HTMLElement>(".brand");
+      const headerButton = header?.querySelector<HTMLElement>(".button");
+      const headerLinks = header
+        ? Array.from(header.querySelectorAll<HTMLElement>("nav a"))
+        : [];
+
+      const heroEyebrow = document.querySelector<HTMLElement>('[data-hero="eyebrow"]');
+      const heroHeading = document.querySelector<HTMLElement>('[data-hero="heading"]');
+      const heroText = document.querySelector<HTMLElement>('[data-hero="text"]');
+      const heroActions = document.querySelector<HTMLElement>('[data-hero="actions"]');
+      const heroDisciplines = document.querySelector<HTMLElement>('[data-hero="disciplines"]');
+      const heroCue = document.querySelector<HTMLElement>('[data-hero="cue"]');
+
       const loaderBrand = loader.querySelector<HTMLElement>(".site-loader__brand");
       const loaderContent = loader.querySelector<HTMLElement>(".site-loader__content");
       const loaderStatus = loader.querySelector<HTMLElement>("[data-loader-status]");
@@ -59,6 +74,16 @@ export default function SiteMotion() {
 
       if (
         !scene ||
+        !announcement ||
+        !header ||
+        !headerBrand ||
+        !headerButton ||
+        !heroEyebrow ||
+        !heroHeading ||
+        !heroText ||
+        !heroActions ||
+        !heroDisciplines ||
+        !heroCue ||
         !loaderBrand ||
         !loaderContent ||
         !loaderStatus ||
@@ -92,7 +117,25 @@ export default function SiteMotion() {
       });
 
       const context = gsap.context(() => {
-        // Website remains fully rendered underneath the loader.
+        // Short post-loader entrance: transform + opacity only.
+        if (!reducedMotion) {
+          gsap.set(scene, {
+            opacity: 0,
+            scale: mobile ? 1.008 : 1.018,
+            transformOrigin: "50% 50%",
+          });
+          gsap.set(announcement, { opacity: 0, y: -6 });
+          gsap.set(header, { opacity: 0, y: -12 });
+          gsap.set([headerBrand, ...headerLinks, headerButton], { opacity: 0, y: -6 });
+
+          gsap.set(heroEyebrow, { opacity: 0, y: 8 });
+          gsap.set(heroHeading, { opacity: 0, y: mobile ? 14 : 18 });
+          gsap.set(heroText, { opacity: 0, y: 12 });
+          gsap.set(heroActions, { opacity: 0, y: 10 });
+          gsap.set(heroDisciplines, { opacity: 0, y: 8 });
+          gsap.set(heroCue, { opacity: 0, y: 6 });
+        }
+
         // Loader true first frame.
         progress.value = 0;
         renderProgress();
@@ -320,26 +363,116 @@ export default function SiteMotion() {
         });
 
         entranceTimeline
+          // Loader clears quickly.
           .to(loaderContent, {
             opacity: 0,
             y: -4,
-            duration: 0.32,
+            duration: 0.26,
             ease: "sine.inOut",
             force3D: true,
           }, 0)
           .to(topPanel, {
             yPercent: -103,
-            duration: 0.92,
+            duration: 0.76,
             ease: "power3.inOut",
             force3D: true,
-          }, 0.16)
+          }, 0.08)
           .to(bottomPanel, {
             yPercent: 103,
-            duration: 0.92,
+            duration: 0.76,
             ease: "power3.inOut",
             force3D: true,
-          }, 0.16)
-          .call(unlockScroll, undefined, 0.86);
+          }, 0.08)
+
+          // Page emerges immediately after the loader begins clearing.
+          .to(scene, {
+            opacity: 1,
+            scale: 1,
+            duration: 0.62,
+            ease: "sine.out",
+            clearProps: "transform,opacity",
+          }, 0.38)
+          .to(announcement, {
+            opacity: 1,
+            y: 0,
+            duration: 0.34,
+            ease: "power2.out",
+            clearProps: "transform,opacity",
+          }, 0.52)
+          .to(header, {
+            opacity: 1,
+            y: 0,
+            duration: 0.44,
+            ease: "power3.out",
+            clearProps: "transform,opacity",
+          }, 0.56)
+          .to(headerBrand, {
+            opacity: 1,
+            y: 0,
+            duration: 0.32,
+            ease: "power3.out",
+            clearProps: "transform,opacity",
+          }, 0.62)
+          .to(headerLinks, {
+            opacity: 1,
+            y: 0,
+            duration: 0.3,
+            stagger: 0.035,
+            ease: "power3.out",
+            clearProps: "transform,opacity",
+          }, 0.68)
+          .to(headerButton, {
+            opacity: 1,
+            y: 0,
+            duration: 0.32,
+            ease: "power3.out",
+            clearProps: "transform,opacity",
+          }, 0.8)
+
+          // Hero follows in a compact stagger, like the reference.
+          .to(heroEyebrow, {
+            opacity: 1,
+            y: 0,
+            duration: 0.3,
+            ease: "power3.out",
+            clearProps: "transform,opacity",
+          }, 0.68)
+          .to(heroHeading, {
+            opacity: 1,
+            y: 0,
+            duration: 0.5,
+            ease: "power4.out",
+            clearProps: "transform,opacity",
+          }, 0.78)
+          .to(heroText, {
+            opacity: 1,
+            y: 0,
+            duration: 0.36,
+            ease: "power3.out",
+            clearProps: "transform,opacity",
+          }, 0.96)
+          .to(heroActions, {
+            opacity: 1,
+            y: 0,
+            duration: 0.34,
+            ease: "power3.out",
+            clearProps: "transform,opacity",
+          }, 1.06)
+          .to(heroDisciplines, {
+            opacity: 1,
+            y: 0,
+            duration: 0.32,
+            ease: "power3.out",
+            clearProps: "transform,opacity",
+          }, 1.16)
+          .to(heroCue, {
+            opacity: 1,
+            y: 0,
+            duration: 0.26,
+            ease: "power2.out",
+            clearProps: "transform,opacity",
+          }, 1.25)
+          .call(unlockScroll, undefined, 1.32);
       }, body);
 
       const pageReady =
