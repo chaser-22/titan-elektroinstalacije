@@ -43,7 +43,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="sr-Latn">
+    <html lang="sr-Latn" className="site-loading">
       <body>{children}</body>
     </html>
   );
