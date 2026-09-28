@@ -1071,28 +1071,52 @@ export default function ElectricalScene() {
       };
 
       // Intro and scroll state are separated from Three.js transforms.
-      // GSAP only updates simple scalar state; the render loop owns the 3D objects.
+      // The render loop still owns the panel transform; a DOM event only starts
+      // scalar/module tweens once the loader has visually cleared.
       const introState = { value: reducedMotion.matches ? 1 : 0 };
-      const introTween = gsap.to(introState, {
-        value: 1,
-        duration: reducedMotion.matches ? 0 : 1.45,
-        ease: "power3.out",
+      let introTween: any = null;
+      const introModuleTweens: any[] = [];
+
+      statusModules.forEach((module) => {
+        if (reducedMotion.matches) {
+          module.group.scale.set(1, 1, 1);
+        } else {
+          module.group.scale.set(0.93, 0.93, 0.93);
+        }
       });
 
-      statusModules.forEach((module, index) => {
-        gsap.fromTo(
-          module.group.scale,
-          { x: 0.9, y: 0.9, z: 0.9 },
-          {
+      const playSceneIntro = () => {
+        if (reducedMotion.matches) {
+          introState.value = 1;
+          statusModules.forEach((module) => module.group.scale.set(1, 1, 1));
+          return;
+        }
+
+        introTween?.kill();
+        introTween = gsap.to(introState, {
+          value: 1,
+          duration: 1.55,
+          ease: "power3.out",
+        });
+
+        statusModules.forEach((module, index) => {
+          const tween = gsap.to(module.group.scale, {
             x: 1,
             y: 1,
             z: 1,
-            delay: reducedMotion.matches ? 0 : 0.12 + index * 0.025,
-            duration: reducedMotion.matches ? 0 : 0.62,
-            ease: "back.out(1.25)",
-          },
-        );
-      });
+            delay: 0.08 + index * 0.035,
+            duration: 0.72,
+            ease: "power3.out",
+          });
+          introModuleTweens.push(tween);
+        });
+      };
+
+      window.addEventListener("titan:enter-3d", playSceneIntro, { once: true });
+
+      if (reducedMotion.matches) {
+        playSceneIntro();
+      }
 
       const scrollTrigger = ScrollTrigger.create({
         trigger: "#glavni-sadrzaj",
@@ -1541,7 +1565,9 @@ export default function ElectricalScene() {
         delete document.documentElement.dataset.titanSceneReady;
 
         scrollTrigger.kill();
-        introTween.kill();
+        window.removeEventListener("titan:enter-3d", playSceneIntro);
+        introTween?.kill();
+        introModuleTweens.forEach((tween) => tween.kill());
         idleTweens.forEach((tween) => tween.kill());
         gsap.killTweensOf(introState);
         gsap.killTweensOf(panelRig.position);
